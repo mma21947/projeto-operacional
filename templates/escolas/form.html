@@ -1,0 +1,184 @@
+{% extends 'base/base.html' %}
+
+{% block title %}{% if escola.id %}Editar Contrato{% else %}Novo Contrato{% endif %}{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2>
+        <i class="bi bi-building me-2"></i>
+        {% if escola.id %}Editar Contrato{% else %}Novo Contrato{% endif %}
+    </h2>
+    <a href="{% url 'escolas:lista' %}" class="btn btn-secondary">
+        <i class="bi bi-arrow-left me-1"></i> Voltar para Contratos
+    </a>
+</div>
+
+<div class="row">
+    <div class="col-md-10 mx-auto">
+        <div class="card">
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-8">
+                            <label for="id_nome" class="form-label">Nome do Contrato <span class="text-danger">*</span></label>
+                            <input type="text" name="nome" id="id_nome" class="form-control" required
+                                   value="{{ escola.nome|default:'' }}">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="id_codigo" class="form-label">Código</label>
+                            <input type="text" name="codigo" id="id_codigo" class="form-control"
+                                   value="{{ escola.codigo|default:'' }}">
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="id_lote" class="form-label">Lote</label>
+                            <input type="text" name="lote" id="id_lote" class="form-control"
+                                  value="{{ escola.lote|default:'' }}">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="id_empresa" class="form-label">Empresa</label>
+                            <input type="text" name="empresa" id="id_empresa" class="form-control"
+                                  value="{{ escola.empresa|default:'' }}">
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <label for="id_budget" class="form-label">Orçamento (R$)</label>
+                            <input type="number" name="budget" id="id_budget" class="form-control" step="0.01" min="0"
+                                   value="{{ escola.budget|default:'0.00' }}">
+                            <div class="form-text">Valor máximo permitido por pedido. Use 0 para sem limite.</div>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="id_data_validade_budget" class="form-label">Validade do Orçamento</label>
+                            <input type="date" name="data_validade_budget" id="id_data_validade_budget" class="form-control"
+                                   value="{% if escola.data_validade_budget %}{{ escola.data_validade_budget|date:'Y-m-d' }}{% endif %}">
+                            <div class="form-text">Data limite para utilização do orçamento. Deixe em branco para não definir validade.</div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="id_endereco" class="form-label">Endereço Completo</label>
+                        <textarea name="endereco" id="id_endereco" class="form-control" rows="2">{{ escola.endereco|default:'' }}</textarea>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-3">
+                            <label for="id_cep" class="form-label">CEP</label>
+                            <input type="text" name="cep" id="id_cep" class="form-control"
+                                   value="{{ escola.cep|default:'' }}">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="id_cidade" class="form-label">Cidade</label>
+                            <input type="text" name="cidade" id="id_cidade" class="form-control"
+                                   value="{{ escola.cidade|default:'' }}">
+                        </div>
+                        <div class="col-md-3">
+                            <label for="id_estado" class="form-label">Estado</label>
+                            <select name="estado" id="id_estado" class="form-select">
+                                <option value="">Selecione...</option>
+                                {% for sigla, nome in estados %}
+                                    <option value="{{ sigla }}" {% if escola.estado == sigla %}selected{% endif %}>{{ nome }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="id_telefone" class="form-label">Telefone</label>
+                            <input type="text" name="telefone" id="id_telefone" class="form-control"
+                                   value="{{ escola.telefone|default:'' }}">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="id_email" class="form-label">E-mail</label>
+                            <input type="email" name="email" id="id_email" class="form-control"
+                                   value="{{ escola.email|default:'' }}">
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="id_supervisor" class="form-label">Supervisor Responsável</label>
+                        <select name="supervisor" id="id_supervisor" class="form-select">
+                            <option value="">Selecione um supervisor...</option>
+                            {% for supervisor in supervisores %}
+                                <option value="{{ supervisor.id }}" {% if escola.supervisor_id == supervisor.id %}selected{% endif %}>
+                                    {{ supervisor.nome }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                        <div class="form-text">
+                            Se o supervisor não estiver na lista, 
+                            <a href="{% url 'gestao:supervisor_novo' %}">
+                                clique aqui para adicionar um novo
+                            </a>.
+                        </div>
+                    </div>
+                    
+                    {% if escola.id %}
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" name="ativo" id="id_ativo" class="form-check-input"
+                               {% if escola.ativo %}checked{% endif %}>
+                        <label for="id_ativo" class="form-check-label">Contrato Ativo</label>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="text-end">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-save me-1"></i> Salvar Contrato
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para adicionar novo supervisor -->
+<div class="modal fade" id="novoSupervisorModal" tabindex="-1" aria-labelledby="novoSupervisorModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="novoSupervisorModalLabel">Adicionar Novo Supervisor</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="formNovoSupervisor">
+                    <div class="mb-3">
+                        <label for="id_supervisor_nome" class="form-label">Nome <span class="text-danger">*</span></label>
+                        <input type="text" name="nome" id="id_supervisor_nome" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="id_supervisor_email" class="form-label">E-mail</label>
+                        <input type="email" name="email" id="id_supervisor_email" class="form-control">
+                    </div>
+                    <div class="mb-3">
+                        <label for="id_supervisor_telefone" class="form-label">Telefone</label>
+                        <input type="text" name="telefone" id="id_supervisor_telefone" class="form-control">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="btnSalvarSupervisor">Salvar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Script para adicionar novo supervisor via AJAX
+    $(document).ready(function() {
+        $('#btnSalvarSupervisor').click(function() {
+            // Implementar lógica AJAX para salvar o supervisor
+            // e adicionar à lista de supervisores no formulário
+            alert('Funcionalidade a ser implementada!');
+            $('#novoSupervisorModal').modal('hide');
+        });
+    });
+</script>
+{% endblock %} 

@@ -1,0 +1,452 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}Central de Relatórios - CyberGo{% endblock %}
+
+{% block extracss %}
+<style>
+    .report-card {
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        padding: 20px;
+        margin-bottom: 20px;
+        transition: all 0.3s;
+    }
+    
+    .filter-section {
+        background-color: #ffffff; 
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 20px;
+        border: 1px solid #dee2e6;
+    }
+    
+    .export-card {
+        border: 1px solid #dee2e6;
+        border-radius: 10px;
+        padding: 25px;
+        margin-bottom: 20px;
+        transition: all 0.3s;
+    }
+    
+    .export-card:hover {
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        transform: translateY(-5px);
+    }
+    
+    .export-card .card-icon {
+        font-size: 3rem;
+        margin-bottom: 15px;
+        color: var(--primary-color);
+    }
+    
+    .export-card h4 {
+        font-weight: 600;
+        margin-bottom: 15px;
+    }
+    
+    .export-card p {
+        color: #6c757d;
+        margin-bottom: 20px;
+    }
+    
+    .export-button {
+        width: 100%;
+        padding: 10px;
+        border-radius: 5px;
+        font-weight: 500;
+    }
+    
+    .tab-content {
+        padding: 20px 0;
+    }
+    
+    .nav-tabs .nav-link {
+        font-weight: 500;
+        color: #495057;
+        border: none;
+        border-bottom: 3px solid transparent;
+        padding: 10px 15px;
+    }
+    
+    .nav-tabs .nav-link.active {
+        color: var(--primary-color);
+        border-bottom: 3px solid var(--primary-color);
+    }
+    
+    .help-text {
+        font-size: 0.9rem;
+        color: #6c757d;
+        margin-top: 0.5rem;
+    }
+    
+    .format-option {
+        display: inline-block;
+        text-align: center;
+        margin-right: 10px;
+        margin-bottom: 10px;
+        cursor: pointer;
+    }
+    
+    .format-option input[type="radio"] {
+        display: none;
+    }
+    
+    .format-option label {
+        display: block;
+        padding: 10px 15px;
+        border: 2px solid #dee2e6;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    
+    .format-option input[type="radio"]:checked + label {
+        background-color: rgba(var(--primary-color-rgb), 0.1);
+        border-color: var(--primary-color);
+        color: var(--primary-color);
+    }
+    
+    .format-option i {
+        display: block;
+        font-size: 2rem;
+        margin-bottom: 5px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="page-header mb-4">
+        <div>
+            <h2 class="mb-1">Central de Relatórios</h2>
+            <p class="text-muted mb-0">Gere relatórios personalizados em Excel ou PDF</p>
+        </div>
+        <div>
+            <a href="{% url 'pedidos:lista' %}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left me-1"></i> Voltar para Pedidos
+            </a>
+        </div>
+    </div>
+    
+    <!-- Abas de navegação -->
+    <ul class="nav nav-tabs" id="reportTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="excel-tab" data-bs-toggle="tab" data-bs-target="#excel" type="button" role="tab" aria-controls="excel" aria-selected="true">
+                <i class="bi bi-file-excel me-1"></i> Relatório Excel
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="pdf-tab" data-bs-toggle="tab" data-bs-target="#pdf" type="button" role="tab" aria-controls="pdf" aria-selected="false">
+                <i class="bi bi-file-pdf me-1"></i> Relatório PDF
+            </button>
+        </li>
+    </ul>
+    
+    <!-- Conteúdo das abas -->
+    <div class="tab-content" id="reportTabsContent">
+        <!-- Aba do Excel -->
+        <div class="tab-pane fade show active" id="excel" role="tabpanel" aria-labelledby="excel-tab">
+            <div class="row mt-4">
+                <div class="col-md-12">
+                    <div class="report-card">
+                        <h4><i class="bi bi-file-excel me-2 text-success"></i>Exportar Relatório para Excel</h4>
+                        <p class="text-muted">Configure as opções abaixo para gerar um relatório Excel completo dos pedidos.</p>
+                        
+                        <form id="excelExportForm" method="post" action="{% url 'pedidos:exportar_excel' %}">
+                            {% csrf_token %}
+                            
+                            <!-- Seção de filtros -->
+                            <div class="filter-section mb-4">
+                                <h5 class="mb-3"><i class="bi bi-funnel me-2"></i>Filtros</h5>
+                                
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Título do Relatório</label>
+                                        <input type="text" class="form-control" id="reportTitle" name="report_title" placeholder="Relatório de Pedidos">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Período</label>
+                                        <select class="form-select" name="period" id="periodSelect">
+                                            <option value="all">Todos os Períodos</option>
+                                            <option value="current_month">Mês Atual</option>
+                                            <option value="last_month">Mês Anterior</option>
+                                            <option value="last_90d">Últimos 90 dias</option>
+                                            <option value="custom">Personalizado</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                
+                                <div class="row mb-3 custom-period-fields d-none">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Data Inicial</label>
+                                        <input type="date" class="form-control" name="start_date">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Data Final</label>
+                                        <input type="date" class="form-control" name="end_date">
+                                    </div>
+                                </div>
+                                
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Status dos Pedidos</label>
+                                        <select class="form-select" name="status" multiple size="5">
+                                            <option value="pendente">Pendente</option>
+                                            <option value="aprovado">Aprovado</option>
+                                            <option value="pedido_enviado">Pedido Enviado</option>
+                                            <option value="entregue">Entregue</option>
+                                            <option value="cancelado">Cancelado</option>
+                                        </select>
+                                        <div class="help-text">Pressione CTRL para selecionar múltiplos (vazio = todos)</div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Empresa</label>
+                                        <select class="form-select" name="empresa">
+                                            <option value="">Todas as Empresas</option>
+                                            {% for empresa in empresas %}
+                                            <option value="{{ empresa.empresa }}">{{ empresa.empresa }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Seção de formatação -->
+                            <div class="filter-section mb-4">
+                                <h5 class="mb-3"><i class="bi bi-brush me-2"></i>Formatação do Excel</h5>
+                                
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Estilo do Cabeçalho</label>
+                                        <div class="d-flex flex-wrap">
+                                            <div class="format-option">
+                                                <input type="radio" id="header-blue" name="header_style" value="default" checked>
+                                                <label for="header-blue">
+                                                    <i class="bi bi-square-fill text-primary"></i>
+                                                    <span>Azul</span>
+                                                </label>
+                                            </div>
+                                            <div class="format-option">
+                                                <input type="radio" id="header-green" name="header_style" value="green">
+                                                <label for="header-green">
+                                                    <i class="bi bi-square-fill text-success"></i>
+                                                    <span>Verde</span>
+                                                </label>
+                                            </div>
+                                            <div class="format-option">
+                                                <input type="radio" id="header-red" name="header_style" value="red">
+                                                <label for="header-red">
+                                                    <i class="bi bi-square-fill text-danger"></i>
+                                                    <span>Vermelho</span>
+                                                </label>
+                                            </div>
+                                            <div class="format-option">
+                                                <input type="radio" id="header-purple" name="header_style" value="purple">
+                                                <label for="header-purple">
+                                                    <i class="bi bi-square-fill text-purple"></i>
+                                                    <span>Roxo</span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Tipo de Fonte</label>
+                                        <select class="form-select" name="font_family">
+                                            <option value="calibri">Calibri (Padrão)</option>
+                                            <option value="arial">Arial</option>
+                                            <option value="times_new_roman">Times New Roman</option>
+                                            <option value="century_gothic">Century Gothic</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                
+                                <div class="row mb-3">
+                                    <div class="col-md-12">
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="checkbox" value="1" id="includeFilters" name="include_filters" checked>
+                                            <label class="form-check-label" for="includeFilters">
+                                                Incluir Filtros Aplicados
+                                            </label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="checkbox" value="1" id="includeSummary" name="include_summary" checked>
+                                            <label class="form-check-label" for="includeSummary">
+                                                Incluir Resumo
+                                            </label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="checkbox" value="1" id="alternateRowColors" name="alternate_row_colors" checked>
+                                            <label class="form-check-label" for="alternateRowColors">
+                                                Alternar cores de linhas
+                                            </label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="checkbox" value="1" id="addAutoFilters" name="add_auto_filters" checked>
+                                            <label class="form-check-label" for="addAutoFilters">
+                                                Adicionar filtros automáticos
+                                            </label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="checkbox" value="1" id="freezeHeaderRow" name="freeze_header_row" checked>
+                                            <label class="form-check-label" for="freezeHeaderRow">
+                                                Congelar cabeçalho
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="alert alert-info">
+                                <i class="bi bi-info-circle me-2"></i>
+                                O relatório Excel incluirá todos os pedidos que correspondem aos critérios de filtro selecionados, com formatação profissional e detalhamento completo.
+                            </div>
+                            
+                            <div class="text-end">
+                                <button type="submit" id="generateExcelBtn" class="btn btn-success">
+                                    <i class="bi bi-file-excel me-1"></i> Gerar Relatório Excel
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Aba do PDF -->
+        <div class="tab-pane fade" id="pdf" role="tabpanel" aria-labelledby="pdf-tab">
+            <div class="row mt-4">
+                <div class="col-md-12">
+                    <div class="report-card">
+                        <h4><i class="bi bi-file-pdf me-2 text-danger"></i>Exportar Relatório para PDF</h4>
+                        <p class="text-muted">Configure as opções abaixo para gerar um relatório PDF dos pedidos.</p>
+                        
+                        <form id="pdfExportForm" action="{% url 'pedidos:exportar' %}" method="get">
+                            <input type="hidden" name="formato" value="pdf">
+                            
+                            <!-- Seção de filtros -->
+                            <div class="filter-section mb-4">
+                                <h5 class="mb-3"><i class="bi bi-funnel me-2"></i>Filtros</h5>
+                                
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Período</label>
+                                        <div class="row">
+                                            <div class="col-6">
+                                                <label class="form-label small">Data Inicial</label>
+                                                <input type="date" class="form-control" name="data_inicio">
+                                            </div>
+                                            <div class="col-6">
+                                                <label class="form-label small">Data Final</label>
+                                                <input type="date" class="form-control" name="data_fim">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Status</label>
+                                        <select class="form-select" name="status">
+                                            <option value="">Todos os Status</option>
+                                            <option value="pendente">Pendente</option>
+                                            <option value="aprovado">Aprovado</option>
+                                            <option value="pedido_enviado">Pedido Enviado</option>
+                                            <option value="entregue">Entregue</option>
+                                            <option value="cancelado">Cancelado</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Empresa</label>
+                                        <select class="form-select" name="empresa">
+                                            <option value="">Todas as Empresas</option>
+                                            {% for empresa in empresas %}
+                                            <option value="{{ empresa.empresa }}">{{ empresa.empresa }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Contrato</label>
+                                        <select class="form-select" name="escola">
+                                            <option value="">Todos os Contratos</option>
+                                            {% for escola in escolas %}
+                                            <option value="{{ escola.id }}">{{ escola.nome }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="alert alert-info">
+                                <i class="bi bi-info-circle me-2"></i>
+                                O relatório PDF incluirá todos os pedidos que correspondem aos critérios de filtro selecionados com formatação adequada para impressão ou arquivamento.
+                            </div>
+                            
+                            <div class="text-end">
+                                <button type="submit" class="btn btn-danger">
+                                    <i class="bi bi-file-pdf me-1"></i> Gerar Relatório PDF
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extrajs %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Gerenciar campos de período personalizado
+    const periodSelect = document.getElementById('periodSelect');
+    const customPeriodFields = document.querySelector('.custom-period-fields');
+    
+    if (periodSelect) {
+        periodSelect.addEventListener('change', function() {
+            if (this.value === 'custom') {
+                customPeriodFields.classList.remove('d-none');
+            } else {
+                customPeriodFields.classList.add('d-none');
+            }
+        });
+    }
+    
+    // Validar formulário Excel antes de enviar
+    const excelForm = document.getElementById('excelExportForm');
+    if (excelForm) {
+        excelForm.addEventListener('submit', function(event) {
+            const reportTitle = document.getElementById('reportTitle').value.trim();
+            if (!reportTitle) {
+                event.preventDefault();
+                alert('Por favor, informe um título para o relatório.');
+                document.getElementById('reportTitle').focus();
+                return false;
+            }
+            
+            if (periodSelect.value === 'custom') {
+                const startDate = document.querySelector('input[name="start_date"]').value;
+                const endDate = document.querySelector('input[name="end_date"]').value;
+                
+                if (!startDate || !endDate) {
+                    event.preventDefault();
+                    alert('Para período personalizado, você precisa informar as datas inicial e final.');
+                    return false;
+                }
+                
+                if (new Date(startDate) > new Date(endDate)) {
+                    event.preventDefault();
+                    alert('A data inicial não pode ser posterior à data final.');
+                    return false;
+                }
+            }
+            
+            return true;
+        });
+    }
+});
+</script>
+{% endblock %} 

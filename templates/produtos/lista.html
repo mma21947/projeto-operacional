@@ -1,0 +1,78 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Lista de Produtos{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2><i class="bi bi-box-seam me-2"></i>Produtos</h2>
+    <div>
+        <a href="{% url 'produtos:novo' %}" class="btn btn-primary">
+            <i class="bi bi-plus-circle me-1"></i> Novo Produto
+        </a>
+        <a href="{% url 'produtos:importar' %}" class="btn btn-outline-success">
+            <i class="bi bi-file-earmark-excel me-1"></i> Importar
+        </a>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        {% if produtos %}
+            <div class="table-responsive">
+                <table class="table table-striped table-hover datatable">
+                    <thead>
+                        <tr>
+                            <th>Nome</th>
+                            <th>Código</th>
+                            <th>Valor Unitário</th>
+                            <th>Unidade</th>
+                            <th>Status</th>
+                            <th width="150">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for produto in produtos %}
+                        <tr>
+                            <td>{{ produto.nome }}</td>
+                            <td>{{ produto.codigo|default:"-" }}</td>
+                            <td>R$ {{ produto.valor_unitario }}</td>
+                            <td>{{ produto.unidade_medida }}</td>
+                            <td>
+                                {% if produto.ativo %}
+                                <span class="badge bg-success">Ativo</span>
+                                {% else %}
+                                <span class="badge bg-danger">Inativo</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <a href="{% url 'produtos:editar' produto.pk %}" class="btn btn-sm btn-primary">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <!-- Adicione aqui outras ações como excluir, detalhes, etc. -->
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="alert alert-info">
+                <i class="bi bi-info-circle me-2"></i> Nenhum produto cadastrado.
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+    $(document).ready(function() {
+        $('.datatable').DataTable({
+            language: {
+                url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/pt-BR.json',
+            },
+            order: [[0, 'asc']], // Ordena pelo nome (primeira coluna)
+            pageLength: 25,
+            responsive: true
+        });
+    });
+</script>
+{% endblock %} 

@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pedido #{{ pedido.id }} - Impressão</title>
+    <style>
+        @page {
+            size: a4;
+            margin: 1.5cm;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 12pt;
+            line-height: 1.5;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #ccc;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .logo-container {
+            margin-bottom: 20px;
+        }
+        .logo-container img {
+            max-height: 80px;
+            max-width: 250px;
+            object-fit: contain;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 20pt;
+            color: #2c3e50;
+        }
+        .header p {
+            margin: 5px 0;
+            font-size: 10pt;
+            color: #7f8c8d;
+        }
+        .info-section {
+            margin-bottom: 20px;
+        }
+        .info-section h2 {
+            font-size: 14pt;
+            color: #2c3e50;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
+            margin-bottom: 10px;
+        }
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        .info-item {
+            margin-bottom: 10px;
+        }
+        .info-item label {
+            font-weight: bold;
+            display: block;
+            font-size: 11pt;
+            color: #555;
+        }
+        .info-item span {
+            display: block;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+        .total-row {
+            font-weight: bold;
+            background-color: #f9f9f9;
+        }
+        .badge {
+            display: inline-block;
+            padding: 3px 7px;
+            border-radius: 3px;
+            font-size: 10pt;
+            color: white;
+        }
+        .badge-pendente { background-color: #f39c12; }
+        .badge-aprovado { background-color: #3498db; }
+        .badge-pedido_enviado { background-color: #2980b9; }
+        .badge-entregue { background-color: #27ae60; }
+        .badge-cancelado { background-color: #e74c3c; }
+        
+        .footer {
+            margin-top: 30px;
+            text-align: center;
+            font-size: 10pt;
+            color: #7f8c8d;
+            border-top: 1px solid #eee;
+            padding-top: 10px;
+        }
+        .assinaturas {
+            margin-top: 100px;
+            display: flex;
+            justify-content: space-around;
+        }
+        .assinatura {
+            width: 200px;
+            text-align: center;
+        }
+        .assinatura-linha {
+            border-top: 1px solid #000;
+            margin-bottom: 5px;
+        }
+        
+        @media print {
+            body {
+                font-size: 12pt;
+            }
+            .no-print {
+                display: none;
+            }
+            button {
+                display: none;
+            }
+            .logo-container img {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="no-print" style="text-align: right; margin: 20px 0;">
+            <button onclick="window.print()">Imprimir</button>
+            <button onclick="window.close()">Fechar</button>
+        </div>
+        
+        <div class="header">
+            <div class="logo-container">
+                <img src="{{ logo_path }}" alt="Logo da Empresa">
+            </div>
+            <h1>FORMULÁRIO DE PEDIDO #{{ pedido.id }}</h1>
+            <p>Data de Impressão: {{ data_hoje|date:"d/m/Y H:i" }}</p>
+        </div>
+        
+        <div class="info-section">
+            <h2>Dados do Pedido</h2>
+            <div class="info-grid">
+                <div class="info-item">
+                    <label>Número do Pedido:</label>
+                    <span>#{{ pedido.id }}</span>
+                </div>
+                <div class="info-item">
+                    <label>Status:</label>
+                    <span>
+                        {% if pedido.status == 'pendente' %}
+                        <span class="badge badge-pendente">Pendente</span>
+                        {% elif pedido.status == 'aprovado' %}
+                        <span class="badge badge-aprovado">Aprovado</span>
+                        {% elif pedido.status == 'pedido_enviado' %}
+                        <span class="badge badge-pedido_enviado">Pedido Enviado</span>
+                        {% elif pedido.status == 'entregue' %}
+                        <span class="badge badge-entregue">Entregue</span>
+                        {% elif pedido.status == 'cancelado' %}
+                        <span class="badge badge-cancelado">Cancelado</span>
+                        {% endif %}
+                    </span>
+                </div>
+                <div class="info-item">
+                    <label>Contrato:</label>
+                    <span>{{ pedido.escola.nome }}</span>
+                </div>
+                <div class="info-item">
+                    <label>Data de Solicitação:</label>
+                    <span>{{ pedido.data_solicitacao|date:"d/m/Y H:i" }}</span>
+                </div>
+                {% if pedido.data_aprovacao %}
+                <div class="info-item">
+                    <label>Data de Aprovação:</label>
+                    <span>{{ pedido.data_aprovacao|date:"d/m/Y H:i" }}</span>
+                </div>
+                {% endif %}
+                {% if pedido.data_envio %}
+                <div class="info-item">
+                    <label>Data de Envio:</label>
+                    <span>{{ pedido.data_envio|date:"d/m/Y H:i" }}</span>
+                </div>
+                {% endif %}
+                {% if pedido.data_entrega %}
+                <div class="info-item">
+                    <label>Data de Entrega:</label>
+                    <span>{{ pedido.data_entrega|date:"d/m/Y H:i" }}</span>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="info-section">
+            <h2>Dados do Contrato</h2>
+            <div class="info-grid">
+                <div class="info-item">
+                    <label>Contrato:</label>
+                    <span>{{ pedido.escola.nome }}</span>
+                </div>
+                {% if pedido.escola.empresa %}
+                <div class="info-item">
+                    <label>Empresa:</label>
+                    <span>{{ pedido.escola.empresa }}</span>
+                </div>
+                {% endif %}
+                {% if pedido.escola.lote %}
+                <div class="info-item">
+                    <label>Lote:</label>
+                    <span>{{ pedido.escola.lote }}</span>
+                </div>
+                {% endif %}
+                {% if pedido.escola.supervisor %}
+                <div class="info-item">
+                    <label>Supervisor:</label>
+                    <span>{{ pedido.escola.supervisor.nome }}</span>
+                </div>
+                {% endif %}
+                {% if pedido.escola.endereco %}
+                <div class="info-item">
+                    <label>Endereço:</label>
+                    <span>
+                        {{ pedido.escola.endereco }}<br>
+                        {% if pedido.escola.cep %}CEP: {{ pedido.escola.cep }}<br>{% endif %}
+                        {% if pedido.escola.cidade %}
+                            {{ pedido.escola.cidade }}{% if pedido.escola.estado %}/{{ pedido.escola.estado }}{% endif %}
+                        {% endif %}
+                    </span>
+                </div>
+                {% endif %}
+                {% if pedido.escola.telefone %}
+                <div class="info-item">
+                    <label>Telefone:</label>
+                    <span>{{ pedido.escola.telefone }}</span>
+                </div>
+                {% endif %}
+                {% if pedido.escola.email %}
+                <div class="info-item">
+                    <label>Email:</label>
+                    <span>{{ pedido.escola.email }}</span>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="info-section">
+            <h2>Itens do Pedido</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Produto</th>
+                        <th style="text-align: center;">Quantidade</th>
+                        <th style="text-align: right;">Valor Unitário</th>
+                        <th style="text-align: right;">Valor Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in pedido.itens.all %}
+                    <tr>
+                        <td>{{ item.produto.nome }}</td>
+                        <td style="text-align: center;">{{ item.quantidade }}</td>
+                        <td style="text-align: right;">R$ {{ item.valor_unitario }}</td>
+                        <td style="text-align: right;">R$ {{ item.valor_total }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+                <tfoot>
+                    <tr class="total-row">
+                        <td colspan="3" style="text-align: right;">Valor Total do Pedido:</td>
+                        <td style="text-align: right;">R$ {{ pedido.valor_total }}</td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+        
+        {% if pedido.observacoes %}
+        <div class="info-section">
+            <h2>Observações</h2>
+            <p>{{ pedido.observacoes|linebreaks }}</p>
+        </div>
+        {% endif %}
+        
+        {% if pedido.status == 'cancelado' and pedido.justificativa_cancelamento %}
+        <div class="info-section">
+            <h2>Justificativa de Cancelamento</h2>
+            <p>{{ pedido.justificativa_cancelamento|linebreaks }}</p>
+        </div>
+        {% endif %}
+        
+        <div class="assinaturas">
+            <div class="assinatura">
+                <div class="assinatura-linha"></div>
+                <p>Responsável pelo Pedido</p>
+            </div>
+            <div class="assinatura">
+                <div class="assinatura-linha"></div>
+                <p>Aprovação</p>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>Documento gerado em {{ data_hoje|date:"d/m/Y H:i" }}</p>
+            <p>Pedido #{{ pedido.id }} - {{ pedido.escola.nome }}</p>
+        </div>
+    </div>
+    
+    <script>
+        // Auto-imprimir ao carregar a página
+        window.onload = function() {
+            // Adicionar um pequeno atraso para garantir que todos os recursos sejam carregados
+            setTimeout(function() {
+                // Pode ser comentado se você preferir que o usuário clique no botão
+                // window.print();
+            }, 500);
+        };
+    </script>
+</body>
+</html> 

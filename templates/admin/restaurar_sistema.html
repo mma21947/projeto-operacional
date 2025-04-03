@@ -1,0 +1,152 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static %}
+
+{% block title %}Restaurar Sistema | {{ site_title|default:_('Django site admin') }}{% endblock %}
+
+{% block extrastyle %}
+  {{ block.super }}
+  <style>
+    .restore-container {
+      max-width: 800px;
+      margin: 20px auto;
+      padding: 20px;
+      background-color: #fff;
+      border-radius: 5px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+    }
+    
+    .restore-container h1 {
+      margin-top: 0;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 10px;
+      color: #417690;
+    }
+    
+    .restore-info {
+      background-color: #f8f9fa;
+      border-left: 4px solid #79aec8;
+      padding: 15px;
+      margin-bottom: 20px;
+    }
+    
+    .restore-warning {
+      background-color: #ffe5e5;
+      border-left: 4px solid #dc3545;
+      padding: 15px;
+      margin-bottom: 20px;
+    }
+    
+    .file-input-container {
+      margin: 20px 0;
+      padding: 15px;
+      border: 2px dashed #ddd;
+      border-radius: 5px;
+      text-align: center;
+      transition: border-color 0.3s;
+    }
+    
+    .file-input-container:hover {
+      border-color: #79aec8;
+    }
+    
+    .file-input-label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 10px;
+      cursor: pointer;
+    }
+    
+    .file-input {
+      display: block;
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+    
+    .restore-btn {
+      background-color: #417690;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      cursor: pointer;
+      border-radius: 4px;
+      font-weight: bold;
+      transition: background-color 0.3s;
+    }
+    
+    .restore-btn:hover {
+      background-color: #2d5066;
+    }
+    
+    .restore-btn:disabled {
+      background-color: #cccccc;
+      cursor: not-allowed;
+    }
+  </style>
+{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+  <a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+  &rsaquo; {% trans 'Restaurar Sistema' %}
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="restore-container">
+  <h1>Restaurar Sistema</h1>
+  
+  <div class="restore-info">
+    <p><strong>Informações importantes:</strong></p>
+    <ul>
+      <li>Use esta página para restaurar o sistema a partir de um arquivo de backup criado anteriormente.</li>
+      <li>O arquivo de backup deve estar no formato ZIP e conter os arquivos necessários (banco de dados e arquivos de mídia).</li>
+      <li>A restauração substituirá completamente o banco de dados e os arquivos de mídia atuais.</li>
+    </ul>
+  </div>
+  
+  <div class="restore-warning">
+    <p><strong>AVISO:</strong></p>
+    <p>A restauração do sistema é uma operação irreversível! Todos os dados atuais serão substituídos pelos dados do backup.</p>
+    <p>Recomendamos fazer um backup do sistema atual antes de prosseguir com a restauração.</p>
+    <p>Durante o processo de restauração, o sistema pode ficar temporariamente indisponível.</p>
+  </div>
+  
+  <form method="post" enctype="multipart/form-data" action="{% url 'admin:restaurar_sistema' %}" id="restore-form">
+    {% csrf_token %}
+    
+    <div class="file-input-container">
+      <label for="backup_file" class="file-input-label">Selecionar arquivo de backup:</label>
+      <input type="file" name="backup_file" id="backup_file" accept=".zip" class="file-input" required>
+      <p class="help-text">Selecione um arquivo de backup válido no formato ZIP.</p>
+    </div>
+    
+    <button type="submit" class="restore-btn" id="restore-btn">Iniciar Restauração</button>
+  </form>
+</div>
+
+<script>
+  document.getElementById('restore-form').addEventListener('submit', function(e) {
+    if (!confirm('ATENÇÃO: Esta operação substituirá todos os dados atuais pelos dados do backup. Deseja continuar?')) {
+      e.preventDefault();
+      return false;
+    }
+    
+    document.getElementById('restore-btn').disabled = true;
+    document.getElementById('restore-btn').textContent = 'Processando...';
+  });
+  
+  document.getElementById('backup_file').addEventListener('change', function() {
+    var fileInput = this;
+    if (fileInput.files.length > 0) {
+      var fileName = fileInput.files[0].name;
+      if (!fileName.toLowerCase().endsWith('.zip')) {
+        alert('O arquivo selecionado não é um arquivo ZIP válido. Por favor, selecione um arquivo de backup no formato ZIP.');
+        fileInput.value = '';
+      }
+    }
+  });
+</script>
+{% endblock %} 

@@ -1,0 +1,123 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Importar Contratos{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2><i class="bi bi-file-earmark-excel me-2"></i>Importar Contratos</h2>
+    <a href="{% url 'escolas:lista' %}" class="btn btn-secondary">
+        <i class="bi bi-arrow-left me-1"></i> Voltar para Contratos
+    </a>
+</div>
+
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="card">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">Upload de Arquivo</h5>
+            </div>
+            <div class="card-body">
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    
+                    <div class="mb-4">
+                        <label for="id_arquivo" class="form-label">Arquivo Excel</label>
+                        <input type="file" name="arquivo" id="id_arquivo" class="form-control" required>
+                        <div class="form-text">
+                            Formatos aceitos: .xlsx, .xls. Tamanho máximo: 10MB.
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="importar_supervisores" id="id_importar_supervisores" checked>
+                            <label class="form-check-label" for="id_importar_supervisores">
+                                Importar/atualizar supervisores
+                            </label>
+                            <div class="form-text">
+                                Se marcado, os supervisores serão criados automaticamente caso não existam.
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="text-end">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-upload me-1"></i> Importar Contratos
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-8 mx-auto">
+        <div class="card">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">Instruções</h5>
+            </div>
+            <div class="card-body">
+                <h6 class="mb-3">Modelo de Arquivo</h6>
+                <p>O arquivo Excel deve conter as seguintes colunas:</p>
+                
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Nome do Contrato</th>
+                                <th>Código</th>
+                                <th>Lote</th>
+                                <th>Empresa</th>
+                                <th>Endereço</th>
+                                <th>CEP</th>
+                                <th>Cidade</th>
+                                <th>Estado</th>
+                                <th>Telefone</th>
+                                <th>Email</th>
+                                <th>Nome do Supervisor</th>
+                                <th>Email do Supervisor</th>
+                                <th>Telefone do Supervisor</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Contrato Municipal José Silva</td>
+                                <td>ESC001</td>
+                                <td>Lote 3</td>
+                                <td>Empresa ABC</td>
+                                <td>Rua das Flores, 123</td>
+                                <td>12345-678</td>
+                                <td>São Paulo</td>
+                                <td>SP</td>
+                                <td>(11) 1234-5678</td>
+                                <td>contato@escolajosesilva.edu.br</td>
+                                <td>Carlos Souza</td>
+                                <td>carlos@exemplo.com</td>
+                                <td>(11) 98765-4321</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="mt-3">
+                    <a href="{% url 'escolas:download_modelo' %}" class="btn btn-outline-success">
+                        <i class="bi bi-download me-1"></i> Baixar Modelo Excel
+                    </a>
+                </div>
+                
+                <hr class="my-4">
+                
+                <h6 class="mb-3">Regras para Importação</h6>
+                <ul>
+                    <li>O campo <strong>Nome do Contrato</strong> é obrigatório.</li>
+                    <li>Se um contrato com o mesmo <strong>Código</strong> já existir, seus dados serão atualizados.</li>
+                    <li>Se o campo <strong>Nome do Supervisor</strong> estiver preenchido e a opção "Importar/atualizar supervisores" 
+                        estiver marcada, o supervisor será criado ou atualizado automaticamente.</li>
+                    <li>Se o supervisor já existir (por email ou nome exatamente igual), ele será associado ao contrato.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

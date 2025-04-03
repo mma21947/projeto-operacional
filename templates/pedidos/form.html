@@ -1,0 +1,450 @@
+{% extends 'base/base.html' %}
+
+{% block title %}{% if pedido.id %}Editar Pedido{% else %}Novo Pedido{% endif %}{% endblock %}
+
+{% block content %}
+<!-- Incluir jQuery no início do conteúdo -->
+<script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+
+<div class="page-header">
+    <h2>
+        <i class="bi bi-cart me-2"></i>
+        {% if pedido.id %}Editar Pedido{% else %}Novo Pedido{% endif %}
+    </h2>
+    <a href="{% url 'pedidos:lista' %}" class="btn btn-secondary">
+        <i class="bi bi-arrow-left me-1"></i> Voltar para Pedidos
+    </a>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                <form method="post" id="formPedido">
+                    {% csrf_token %}
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-8">
+                            <label for="id_escola" class="form-label">Contrato <span class="text-danger">*</span></label>
+                            <select name="escola" id="id_escola" class="form-select" required {% if pedido.id %}disabled{% endif %}>
+                                <option value="">Selecione um contrato...</option>
+                                {% for escola in escolas %}
+                                    <option value="{{ escola.id }}" 
+                                        {% if pedido.escola_id == escola.id %}selected{% endif %}
+                                        data-budget="{{ escola.budget }}">
+                                        {{ escola.nome }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                            <div class="form-text">O contrato não pode ser alterado após a criação do pedido.</div>
+                            
+                            <!-- Alerta de orçamento -->
+                            <div id="alertaOrcamento" class="alert alert-danger mt-2 d-none">
+                                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                                O valor do pedido excede o orçamento disponível para este contrato!
+                                <div class="mt-1">
+                                    <strong>Orçamento:</strong> R$ <span id="valorOrcamento">0,00</span>
+                                    <br>
+                                    <strong>Valor atual:</strong> R$ <span id="valorAtual">0,00</span>
+                                </div>
+                            </div>
+                        </div>
+                        {% if pedido.id %}
+                        <!-- Se for um pedido existente, mostra a data da solicitação -->
+                        <div class="col-md-4">
+                            <label for="id_data_solicitacao" class="form-label">Data de Solicitação</label>
+                            <input type="datetime-local" name="data_solicitacao" id="id_data_solicitacao" class="form-control"
+                                   value="{{ pedido.data_solicitacao|date:'Y-m-d\TH:i' }}" readonly>
+                        </div>
+                        {% else %}
+                        <!-- Se for um novo pedido, campo oculto para a data de solicitação -->
+                        <input type="hidden" name="data_solicitacao" id="id_data_solicitacao">
+                        {% endif %}
+                    </div>
+                    
+                    {% if pedido.id %}
+                    <div class="row mb-4">
+                        <div class="col-md-4">
+                            <label for="id_status" class="form-label">Status <span class="text-danger">*</span></label>
+                            <select name="status" id="id_status" class="form-select" required>
+                                {% for key, value in status_choices %}
+                                    <option value="{{ key }}" {% if pedido.status == key %}selected{% endif %}>
+                                        {{ value }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="mb-4">
+                        <label for="id_observacoes" class="form-label">Observações</label>
+                        <textarea name="observacoes" id="id_observacoes" class="form-control" rows="2">{{ pedido.observacoes|default:'' }}</textarea>
+                    </div>
+                    
+                    <hr class="my-4">
+                    
+                    <h5 class="mb-3">Itens do Pedido</h5>
+                    
+                    <div id="itens-container">
+                        {% if pedido.itens.all %}
+                            {% for item in pedido.itens.all %}
+                            <div class="row item-row mb-2">
+                                <div class="col-md-6">
+                                    <select name="produto[]" class="form-select produto-select" required>
+                                        <option value="">Selecione um produto...</option>
+                                        {% for produto in produtos %}
+                                            <option 
+                                                value="{{ produto.id }}" 
+                                                data-valor="{{ produto.valor_unitario }}"
+                                                {% if item.produto_id == produto.id %}selected{% endif %}
+                                            >
+                                                {{ produto.nome }}
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
+                                    <input type="number" name="quantidade[]" class="form-control quantidade-input" placeholder="Quantidade" 
+                                           min="1" required value="{{ item.quantidade }}">
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="input-group">
+                                        <span class="input-group-text">R$</span>
+                                        <input type="text" class="form-control valor-unitario" readonly style="background-color: #f8f9fa;" value="{{ item.valor_unitario }}">
+                                    </div>
+                                </div>
+                                <div class="col-md-1">
+                                    <button type="button" class="btn btn-danger btn-remover-item">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                                <input type="hidden" name="item_id[]" value="{{ item.id }}">
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="row item-row mb-2">
+                                <div class="col-md-6">
+                                    <select name="produto[]" class="form-select produto-select" required>
+                                        <option value="">Selecione um produto...</option>
+                                        {% for produto in produtos %}
+                                            <option 
+                                                value="{{ produto.id }}" 
+                                                data-valor="{{ produto.valor_unitario }}"
+                                            >
+                                                {{ produto.nome }}
+                                            </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
+                                    <input type="number" name="quantidade[]" class="form-control quantidade-input" placeholder="Quantidade" min="1" required>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="input-group">
+                                        <span class="input-group-text">R$</span>
+                                        <input type="text" class="form-control valor-unitario" readonly style="background-color: #f8f9fa;">
+                                    </div>
+                                </div>
+                                <div class="col-md-1">
+                                    <button type="button" class="btn btn-danger btn-remover-item">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                                <input type="hidden" name="item_id[]" value="">
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-4">
+                        <button type="button" id="btnAdicionarItem" class="btn btn-outline-primary">
+                            <i class="bi bi-plus-circle me-1"></i> Adicionar Item
+                        </button>
+                    </div>
+                    
+                    <hr class="my-4">
+                    
+                    <div class="row">
+                        <div class="col-md-8">
+                            <!-- Espaço para mensagens ou outros controles -->
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card bg-light">
+                                <div class="card-body">
+                                    <h6 class="mb-3">Resumo do Pedido</h6>
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <strong>Total de Itens:</strong>
+                                        <span id="totalItens">0</span>
+                                    </div>
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <strong>Valor Total:</strong>
+                                        <span id="valorTotal">R$ 0,00</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between">
+                        <a href="{% url 'pedidos:lista' %}" class="btn btn-outline-secondary">
+                            <i class="bi bi-x-circle me-1"></i> Cancelar
+                        </a>
+                        <button type="submit" class="btn btn-success" id="btnSubmitPedido">
+                            <i class="bi bi-check-circle me-1"></i> 
+                            {% if pedido.id %}Salvar Alterações{% else %}Criar Pedido{% endif %}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Template para novos itens -->
+<template id="item-template">
+    <div class="row item-row mb-2">
+        <div class="col-md-6">
+            <select name="produto[]" class="form-select produto-select" required>
+                <option value="">Selecione um produto...</option>
+                {% for produto in produtos %}
+                    <option 
+                        value="{{ produto.id }}" 
+                        data-valor="{{ produto.valor_unitario }}"
+                    >
+                        {{ produto.nome }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-2">
+            <input type="number" name="quantidade[]" class="form-control quantidade-input" placeholder="Quantidade" min="1" required>
+        </div>
+        <div class="col-md-3">
+            <div class="input-group">
+                <span class="input-group-text">R$</span>
+                <input type="text" class="form-control valor-unitario" readonly style="background-color: #f8f9fa;">
+            </div>
+        </div>
+        <div class="col-md-1">
+            <button type="button" class="btn btn-danger btn-remover-item">
+                <i class="bi bi-trash"></i>
+            </button>
+        </div>
+        <input type="hidden" name="item_id[]" value="">
+    </div>
+</template>
+
+<script>
+    // Verificar se o jQuery está carregado
+    if (typeof jQuery === 'undefined') {
+        console.error('ERRO: jQuery não está carregado! A funcionalidade de adicionar/remover itens não funcionará.');
+        // Removendo o alerta para não incomodar o usuário
+        // Tentando carregar o jQuery dinamicamente
+        var script = document.createElement('script');
+        script.src = 'https://code.jquery.com/jquery-3.7.1.min.js';
+        script.integrity = 'sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=';
+        script.crossOrigin = 'anonymous';
+        document.head.appendChild(script);
+        
+        script.onload = function() {
+            console.log('jQuery carregado dinamicamente com sucesso!');
+            setTimeout(inicializarFuncionalidades, 100);
+        };
+    } else {
+        console.log('jQuery carregado com sucesso: versão ' + jQuery.fn.jquery);
+        $(document).ready(inicializarFuncionalidades);
+    }
+
+    function inicializarFuncionalidades() {
+        // Debug: Exibe todos os valores de produtos disponíveis
+        console.log('PRODUTOS DISPONÍVEIS:');
+        $('.produto-select option').each(function() {
+            const id = $(this).val();
+            const nome = $(this).text();
+            const valor = $(this).attr('data-valor');
+            if (id) {
+                console.log(`ID: ${id}, Nome: ${nome}, Valor: ${valor}, Tipo: ${typeof valor}`);
+            }
+        });
+        
+        // Formata os valores dos itens existentes ao carregar a página
+        $('.valor-unitario').each(function() {
+            const valor = $(this).val() || '0';
+            if (valor) {
+                $(this).val(Number(valor).toFixed(2).replace('.', ','));
+            }
+        });
+        
+        // Função para atualizar o valor unitário ao selecionar um produto
+        $(document).on('change', '.produto-select', function() {
+            const select = $(this);
+            const option = select.find('option:selected');
+            const row = select.closest('.item-row');
+            const valorUnitarioField = row.find('.valor-unitario');
+            
+            // Se nenhuma opção foi selecionada, limpa o campo
+            if (!option.val()) {
+                valorUnitarioField.val('');
+                atualizarTotais();
+                return;
+            }
+            
+            // Obtém o valor unitário diretamente do elemento option
+            const valor = option.attr('data-valor');
+            console.log('Produto selecionado:', option.text());
+            console.log('Valor do atributo data-valor:', valor);
+            
+            if (valor && valor !== 'None' && valor !== 'undefined') {
+                try {
+                    // Converte para número e formata com 2 casas decimais
+                    const num = parseFloat(valor.replace(',', '.'));
+                    if (!isNaN(num)) {
+                        const valorFormatado = num.toFixed(2).replace('.', ',');
+                        valorUnitarioField.val(valorFormatado);
+                        console.log('Valor formatado definido:', valorFormatado);
+                    } else {
+                        console.log('Valor não é um número válido:', valor);
+                        valorUnitarioField.val('0,00');
+                    }
+                } catch (e) {
+                    console.error('Erro ao processar valor:', e);
+                    valorUnitarioField.val('0,00');
+                }
+            } else {
+                console.log('Valor unitário não encontrado ou inválido');
+                valorUnitarioField.val('0,00');
+            }
+            
+            atualizarTotais();
+        });
+        
+        // Função para atualizar os totais ao alterar a quantidade
+        $(document).on('input', '.quantidade-input', function() {
+            atualizarTotais();
+        });
+        
+        // Adiciona um novo item
+        $('#btnAdicionarItem').click(function() {
+            // Log para depuração
+            console.log('Adicionando novo item ao pedido...');
+            
+            // Criar uma cópia da primeira linha de item
+            const primeiraLinha = $('.item-row:first').clone();
+            
+            // Limpar os valores da cópia
+            primeiraLinha.find('select.produto-select').val('');
+            primeiraLinha.find('input.quantidade-input').val('');
+            primeiraLinha.find('input.valor-unitario').val('');
+            primeiraLinha.find('input[name="item_id[]"]').val('');
+            
+            // Adicionar a nova linha ao container
+            $('#itens-container').append(primeiraLinha);
+            
+            // Log de confirmação
+            console.log('Item adicionado com sucesso! Total de itens:', $('.item-row').length);
+            
+            // Atualizar os totais
+            atualizarTotais();
+        });
+        
+        // Remove um item
+        $(document).on('click', '.btn-remover-item', function(e) {
+            // Evitar comportamento padrão
+            e.preventDefault();
+            
+            // Log para depuração
+            console.log('Removendo item...');
+            
+            // Contar o número total de itens
+            const totalItens = $('.item-row').length;
+            console.log('Total de itens antes da remoção:', totalItens);
+            
+            // Verificar se podemos remover (manter pelo menos um item)
+            if (totalItens > 1) {
+                // Remover a linha
+                $(this).closest('.item-row').remove();
+                console.log('Item removido. Restantes:', $('.item-row').length);
+                
+                // Atualizar totais
+                atualizarTotais();
+            } else {
+                // Alertar o usuário
+                alert('O pedido deve ter pelo menos um item.');
+                console.log('Tentativa de remoção cancelada: é preciso manter pelo menos um item');
+            }
+        });
+        
+        // Trigger para inicializar os valores dos produtos já selecionados
+        setTimeout(function() {
+            console.log('Iniciando trigger para produtos selecionados');
+            $('.produto-select').each(function() {
+                if ($(this).val()) {
+                    console.log('Produto já selecionado, ID:', $(this).val());
+                    $(this).trigger('change');
+                }
+            });
+            // Inicializa os totais após configurar os produtos
+            atualizarTotais();
+        }, 100);
+    }
+    
+    // Função para atualizar os totais
+    function atualizarTotais() {
+        let totalItens = 0;
+        let valorTotal = 0;
+        
+        $('.item-row').each(function() {
+            const quantidade = parseInt($(this).find('.quantidade-input').val()) || 0;
+            // Converte o valor formatado (com vírgula) para número
+            const valorUnitarioStr = $(this).find('.valor-unitario').val() || '0';
+            const valorUnitario = parseFloat(valorUnitarioStr.replace(',', '.')) || 0;
+            
+            totalItens += quantidade;
+            valorTotal += quantidade * valorUnitario;
+        });
+        
+        $('#totalItens').text(totalItens);
+        $('#valorTotal').text('R$ ' + valorTotal.toFixed(2).replace('.', ','));
+        
+        // Verificar se excede o orçamento
+        verificarOrcamento(valorTotal);
+    }
+    
+    // Função para verificar se o valor total excede o orçamento
+    function verificarOrcamento(valorTotal) {
+        const escolaSelect = $('#id_escola');
+        const escolaOption = escolaSelect.find('option:selected');
+        const budget = parseFloat(escolaOption.attr('data-budget') || 0);
+        
+        // Atualiza os valores no alerta
+        $('#valorOrcamento').text(budget.toFixed(2).replace('.', ','));
+        $('#valorAtual').text(valorTotal.toFixed(2).replace('.', ','));
+        
+        // Se o orçamento for maior que zero e o valor total exceder o orçamento
+        if (budget > 0 && valorTotal > budget) {
+            $('#alertaOrcamento').removeClass('d-none');
+            
+            // Desabilita o botão "Adicionar Item"
+            $('#btnAdicionarItem').prop('disabled', true).addClass('disabled')
+                .attr('title', 'Limite de orçamento excedido');
+            
+            // Desabilita o botão de submissão do formulário
+            $('#btnSubmitPedido').prop('disabled', true).addClass('disabled')
+                .attr('title', 'Limite de orçamento excedido');
+        } else {
+            $('#alertaOrcamento').addClass('d-none');
+            
+            // Reabilita os botões
+            $('#btnAdicionarItem').prop('disabled', false).removeClass('disabled')
+                .attr('title', '');
+            $('#btnSubmitPedido').prop('disabled', false).removeClass('disabled')
+                .attr('title', '');
+        }
+    }
+    
+    // Quando o contrato for alterado, verificar orçamento
+    $('#id_escola').change(function() {
+        atualizarTotais();
+    });
+</script>
+{% endblock %} 

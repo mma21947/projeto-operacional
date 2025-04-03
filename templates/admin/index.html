@@ -1,0 +1,28 @@
+{% extends "admin/index.html" %}
+{% load i18n static %}
+
+{% block content %}
+    {{ block.super }}
+    
+    {% if backup_restauracao %}
+    <div id="backup-restauracao-app" class="app-backup module">
+        <table>
+            <caption>
+                <a class="section" title="Backup e Restauração do Sistema">Backup e Restauração do Sistema</a>
+            </caption>
+            <tbody>
+                {% for item in backup_restauracao %}
+                <tr class="model-{{ item.name|lower|cut:" " }}">
+                    <th scope="row">
+                        <a href="{% url item.admin_url %}">{{ item.name }}</a>
+                    </th>
+                    <td>
+                        <p>{{ item.description }}</p>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+{% endblock %} 

@@ -1,0 +1,66 @@
+# Arquivos de ambiente Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+.env
+.venv
+
+# Ambiente virtual
+bin/
+include/
+lib/
+lib64/
+share/
+pyvenv.cfg
+
+# Arquivos de distribuição
+*.egg-info/
+dist/
+build/
+eggs/
+parts/
+.installed.cfg
+
+# Arquivos de banco de dados
+*.sqlite3
+*.sqlite3-journal
+db.sqlite3.bak*
+
+# Arquivos de mídia e estáticos em produção
+/media/
+/staticfiles/
+
+# Arquivos de log
+*.log
+local_settings.py
+
+# Arquivos específicos do Django
+*.pot
+*.mo
+
+# Arquivos de IDE e editores
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+*~
+
+# Arquivos de segurança
+*.pem
+*.key
+
+# Informações sensíveis
+.env*
+.flaskenv*
+!.env.project
+!.env.vault
+
+# Arquivos temporários
+temp/
+tmp/ 

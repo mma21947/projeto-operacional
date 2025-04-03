@@ -1,0 +1,73 @@
+{% extends 'base/base.html' %}
+
+{% block title %}{% if produto.id %}Editar Produto{% else %}Novo Produto{% endif %}{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2>
+        <i class="bi bi-box-seam me-2"></i>
+        {% if produto.id %}Editar Produto{% else %}Novo Produto{% endif %}
+    </h2>
+    <a href="{% url 'produtos:lista' %}" class="btn btn-secondary">
+        <i class="bi bi-arrow-left me-1"></i> Voltar para Produtos
+    </a>
+</div>
+
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="card">
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-8">
+                            <label for="id_nome" class="form-label">Nome do Produto <span class="text-danger">*</span></label>
+                            <input type="text" name="nome" id="id_nome" class="form-control" required
+                                   value="{{ produto.nome|default:'' }}">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="id_codigo" class="form-label">Código</label>
+                            <input type="text" name="codigo" id="id_codigo" class="form-control"
+                                   value="{{ produto.codigo|default:'' }}">
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="id_descricao" class="form-label">Descrição</label>
+                        <textarea name="descricao" id="id_descricao" class="form-control" rows="3">{{ produto.descricao|default:'' }}</textarea>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="id_valor_unitario" class="form-label">Valor Unitário (R$) <span class="text-danger">*</span></label>
+                            <input type="text" name="valor_unitario" id="id_valor_unitario" class="form-control" required
+                                   value="{{ produto.valor_unitario|default:'' }}">
+                            <div class="form-text">Use ponto ou vírgula como separador decimal.</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="id_unidade_medida" class="form-label">Unidade de Medida</label>
+                            <input type="text" name="unidade_medida" id="id_unidade_medida" class="form-control"
+                                   value="{{ produto.unidade_medida|default:'Unidade' }}">
+                        </div>
+                    </div>
+                    
+                    {% if produto.id %}
+                    <div class="mb-3 form-check">
+                        <input type="checkbox" name="ativo" id="id_ativo" class="form-check-input"
+                               {% if produto.ativo %}checked{% endif %}>
+                        <label for="id_ativo" class="form-check-label">Produto Ativo</label>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="text-end">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-save me-1"></i> Salvar Produto
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 
