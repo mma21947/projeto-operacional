@@ -1,0 +1,36 @@
+# Instruções para subir o projeto no GitHub
+
+Para subir este projeto no GitHub, siga estas etapas:
+
+1. Acesse [GitHub](https://github.com) e faça login com sua conta
+2. Clique no botão "+" no canto superior direito e selecione "New repository"
+3. Nomeie o repositório como "Projeto-Operacional"
+4. Deixe a descrição em branco ou adicione uma breve descrição
+5. Mantenha o repositório como público (ou privado, se preferir)
+6. NÃO inicialize o repositório com README, .gitignore ou licença
+7. Clique em "Create repository"
+
+8. Após criar o repositório, você precisará gerar um token de acesso pessoal:
+   - Clique na sua foto de perfil no canto superior direito
+   - Selecione "Settings" (Configurações)
+   - No menu lateral esquerdo, vá para "Developer settings" (Configurações de desenvolvedor)
+   - Selecione "Personal access tokens" (Tokens de acesso pessoal) e depois "Tokens (classic)"
+   - Clique em "Generate new token" (Gerar novo token) e depois "Generate new token (classic)"
+   - Dê um nome para o token, como "Projeto Operacional"
+   - Selecione os escopos "repo" (para acesso completo aos repositórios)
+   - Clique em "Generate token" (Gerar token)
+   - Copie o token gerado (você não poderá vê-lo novamente)
+
+9. De volta ao seu terminal, execute os seguintes comandos (substitua YOUR_TOKEN pelo token que você copiou):
+
+```bash
+git remote set-url origin https://YOUR_TOKEN@github.com/mma21947/Projeto-Operacional.git
+git push -u origin master
+```
+
+10. Os arquivos serão enviados para o GitHub e ficarão disponíveis em https://github.com/mma21947/Projeto-Operacional
+
+Observações:
+- Este projeto já está configurado com o .gitignore apropriado
+- O arquivo settings.py foi modificado para proteger dados sensíveis
+- O README.md já contém informações básicas sobre o projeto 

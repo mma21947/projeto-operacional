@@ -1,0 +1,73 @@
+# Configuração do Projeto após Clone do GitHub
+
+Após clonar este repositório do GitHub, siga estas etapas para configurar o ambiente e executar o projeto:
+
+1. Crie um ambiente virtual e ative-o:
+```bash
+python -m venv venv
+# No Windows
+venv\Scripts\activate
+# No Linux/Mac
+source venv/bin/activate
+```
+
+2. Instale as dependências:
+```bash
+pip install -r requirements.txt
+```
+
+3. Crie um arquivo `.env` na raiz do projeto com as seguintes variáveis de ambiente:
+```
+DJANGO_SECRET_KEY=sua_chave_secreta_aqui
+DJANGO_DEBUG=True
+DJANGO_ALLOWED_HOSTS=localhost,127.0.0.1
+```
+
+4. Execute as migrações para criar o banco de dados:
+```bash
+python manage.py migrate
+```
+
+5. Crie um superusuário para acessar a área administrativa:
+```bash
+python manage.py createsuperuser
+```
+
+6. Execute o servidor de desenvolvimento:
+```bash
+python manage.py runserver
+```
+
+7. Acesse o sistema no navegador: http://127.0.0.1:8000/
+
+## Scripts auxiliares disponíveis
+
+O projeto contém alguns scripts auxiliares que podem ser úteis:
+
+- `criar_perfis.py`: Cria perfis de usuário e grupos de permissão
+- `executar_perfis.py`: Executa a criação de perfis
+- `restaurar_admin.py`: Restaura o usuário administrador
+- `verificar_grupos_admin.py`: Verifica os grupos de administração
+
+Para executar estes scripts, use:
+```bash
+python nome_do_script.py
+```
+
+## Estrutura do Projeto
+
+- `config/`: Configurações do Django
+- `core/`: Aplicação principal com funcionalidades centrais
+- `produtos/`: Gerenciamento de produtos
+- `escolas/`: Gerenciamento de escolas
+- `pedidos/`: Gerenciamento de pedidos
+- `gestao/`: Gerenciamento de supervisores e administração
+- `usuarios/`: Autenticação e perfis de usuário
+- `templates/`: Templates HTML
+- `static/`: Arquivos estáticos (CSS, JS, imagens)
+
+## Observações importantes
+
+- Por padrão, o projeto usa SQLite como banco de dados, mas pode ser configurado para usar outros bancos como PostgreSQL ou MySQL
+- O sistema de autenticação foi personalizado com diferentes níveis de acesso
+- Mantenha o arquivo `.env` seguro e nunca o inclua no controle de versão 
