@@ -3,6 +3,20 @@
 {% block title %}Lista de Pedidos{% endblock %}
 
 {% block content %}
+<style>
+
+.page-header {
+    margin-bottom: 160px; /* Adiciona mais espaço após o cabeçalho onde está o dropdown */
+}
+.card-body {
+    z-index: -1;
+}
+.card-body mb-4 {
+    margin-top: 100px;
+}
+
+</style>
+
 <div class="page-header">
     <h2><i class="bi bi-cart me-2"></i>Pedidos</h2>
     <div>
@@ -13,7 +27,7 @@
             <button type="button" class="btn btn-outline-success dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
                 <i class="bi bi-file-earmark-arrow-down me-1"></i> Exportar
             </button>
-            <ul class="dropdown-menu dropdown-menu-end">
+            <ul class="dropdown-menu dropdown-menu-end";>
                 <li>
                     <a class="dropdown-item" href="#" id="exportar-excel-selecionados">
                         <i class="bi bi-file-earmark-excel me-1"></i> Exportar para Excel

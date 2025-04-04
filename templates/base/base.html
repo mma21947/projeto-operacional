@@ -453,6 +453,10 @@
             position: relative;
             z-index: 1;
         }
+        a {
+            color: white;
+            text-decoration: none;
+        }
         
         /* Menu dropdown do usuário específico */
         .navbar .dropdown-menu {
@@ -533,7 +537,7 @@
         <div class="container">
             <a class="navbar-brand" href="{% url 'core:home' %}">
                 <img src="{% static 'images/logo.png' %}" alt="Logo da Empresa" style="height: 60px; margin-right: 15px; object-fit: contain;">
-                <span style="font-size: 1.2em; font-weight: 700;">CyberForce</span> <span class="ms-1 fw-normal" style="opacity: 0.9; font-size: 1em;"></span>
+                <span style="font-size: 1.2em; font-weight: 700;">CyberGo</span> <span class="ms-1 fw-normal" style="opacity: 0.9; font-size: 1em;"></span>
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" 
                     aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -656,7 +660,7 @@
     <!-- Footer -->
     <footer class="py-3">
         <div class="container text-center">
-            <p class="mb-0">&copy; {% now "Y" %} Desenvolvido por CyberForce. Todos os direitos reservados.</p>
+            <p class="mb-0">&copy; {% now "Y" %} Desenvolvido por <a href="https://cyberforce.com.br" target="_blank">CyberForce</a>. Todos os direitos reservados.</p>
         </div>
     </footer>
     
