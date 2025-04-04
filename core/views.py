@@ -29,6 +29,25 @@ from produtos.models import Produto
 from escolas.models import Escola, Supervisor 
 from pedidos.models import Pedido, ItemPedido
 
+# Função para servir o manual do usuário
+def manual_usuario(request):
+    """
+    Serve o arquivo HTML do manual do usuário.
+    """
+    file_path = os.path.join(settings.BASE_DIR, 'apresentacao_cybergo_usuarios.html')
+    try:
+        with open(file_path, 'r', encoding='utf-8') as file:
+            content = file.read()
+            
+        # Substituir referências relativas para arquivos estáticos por caminhos absolutos
+        content = content.replace('src="static/', 'src="/static/')
+        content = content.replace('href="static/', 'href="/static/')
+            
+        return HttpResponse(content, content_type='text/html')
+    except FileNotFoundError:
+        messages.error(request, 'O manual do usuário não foi encontrado.')
+        return redirect('core:home')
+
 # Importar todos os modelos necessários no topo do arquivo
 from core.models import Empresa, Contrato, DetalhesContrato
 from escolas.models import Escola

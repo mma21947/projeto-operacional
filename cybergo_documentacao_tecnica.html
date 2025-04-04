@@ -1,0 +1,1598 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentação Técnica - CyberGo</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #1a5fb4;
+            --primary-dark: #0b4791;
+            --secondary-color: #3584e4;
+            --accent-color: #e66100;
+            --bg-color: #f6f6f9;
+            --text-color: #333333;
+            --slide-bg: #ffffff;
+            --card-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            --transition: all 0.3s ease;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            overflow-x: hidden;
+        }
+        
+        .slides-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .slide {
+            width: 100%;
+            max-width: 1200px; /* Tamanho do slide */
+            height: 675px; /* Proporção 16:9 para PowerPoint */
+            background-color: var(--slide-bg);
+            margin: 20px 0;
+            box-shadow: var(--card-shadow);
+            page-break-after: always; /* Para impressão/PDF */
+            position: relative;
+            overflow: hidden;
+            padding: 35px;
+            border-radius: 8px;
+            transition: var(--transition);
+            font-size: 0.95rem;
+        }
+        
+        .slide-header {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 8px;
+            background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+        }
+        
+        .slide-number {
+            position: absolute;
+            bottom: 15px;
+            right: 20px;
+            font-size: 14px;
+            color: #666;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .slide-number::before {
+            content: "";
+            width: 30px;
+            height: 2px;
+            background-color: var(--primary-color);
+            opacity: 0.6;
+        }
+        
+        .slide-logo {
+            position: absolute;
+            bottom: 15px;
+            left: 20px;
+            height: 30px;
+        }
+        
+        h1, h2, h3, h4 {
+            color: var(--primary-color);
+            margin-bottom: 15px;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        h2 {
+            font-size: 1.8rem;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        h2 i {
+            font-size: 0.9em;
+            color: var(--secondary-color);
+        }
+        
+        h3 {
+            font-size: 1.25rem;
+            color: var(--secondary-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 5px;
+        }
+        
+        h3 i {
+            font-size: 0.9em;
+        }
+        
+        p, li {
+            font-size: 0.95rem;
+            line-height: 1.4;
+            margin-bottom: 8px;
+        }
+        
+        ul, ol {
+            margin-left: 20px;
+            margin-bottom: 8px;
+        }
+        
+        li {
+            position: relative;
+            margin-bottom: 2px;
+        }
+        
+        .text-center {
+            text-align: center;
+        }
+        
+        .flex-center {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+        }
+        
+        .columns {
+            display: flex;
+            gap: 12px;
+            margin: 10px 0;
+        }
+        
+        .column {
+            flex: 1;
+        }
+        
+        .card {
+            background-color: var(--slide-bg);
+            border-radius: 8px;
+            box-shadow: var(--card-shadow);
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid rgba(0,0,0,0.05);
+            transition: var(--transition);
+            max-height: none;
+            overflow: visible;
+        }
+        
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.12);
+        }
+        
+        .box {
+            background-color: rgba(26, 95, 180, 0.05);
+            border: 1px solid rgba(26, 95, 180, 0.1);
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 10px;
+            position: relative;
+            transition: var(--transition);
+            max-height: none;
+            overflow: visible;
+        }
+        
+        .box:hover {
+            background-color: rgba(26, 95, 180, 0.08);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(26, 95, 180, 0.08);
+        }
+        
+        .slide-title {
+            margin-top: 10px;
+            margin-bottom: 5px;
+        }
+        
+        code {
+            font-family: 'Roboto Mono', monospace;
+            background-color: #f8f9fa;
+            padding: 2px 5px;
+            border-radius: 4px;
+            font-size: 0.85em;
+            color: var(--accent-color);
+        }
+        
+        pre {
+            background-color: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+            padding: 8px;
+            margin: 10px 0;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.65rem;
+            overflow-x: visible;
+            max-height: none;
+            position: relative;
+        }
+        
+        pre::before {
+            content: "código";
+            position: absolute;
+            top: 0;
+            right: 0;
+            background-color: rgba(0,0,0,0.05);
+            padding: 2px 6px;
+            font-size: 0.65rem;
+            color: #666;
+            border-radius: 0 6px 0 6px;
+        }
+        
+        .note {
+            background-color: rgba(53, 132, 228, 0.1);
+            border-left: 4px solid var(--secondary-color);
+            padding: 8px;
+            margin: 8px 0;
+            border-radius: 0 4px 4px 0;
+            position: relative;
+            font-size: 0.8rem;
+        }
+        
+        .note::before {
+            content: "\f05a";
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            margin-right: 10px;
+            color: var(--secondary-color);
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 12px 0;
+            box-shadow: var(--card-shadow);
+            border-radius: 8px;
+            overflow: hidden;
+            font-size: 0.85rem;
+        }
+        
+        th {
+            background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+            color: white;
+            text-align: left;
+            padding: 8px 12px;
+            font-weight: 600;
+        }
+        
+        td {
+            padding: 6px 10px;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        tr:last-child td {
+            border-bottom: none;
+        }
+        
+        tr:nth-child(even) {
+            background-color: rgba(0,0,0,0.02);
+        }
+        
+        .icon-square {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 30px;
+            height: 30px;
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 6px;
+            margin-right: 8px;
+            font-size: 1rem;
+        }
+        
+        .steps {
+            counter-reset: step;
+            list-style-type: none;
+            margin-left: 0;
+        }
+        
+        .steps li {
+            position: relative;
+            padding-left: 40px;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+        
+        .steps li::before {
+            counter-increment: step;
+            content: counter(step);
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 28px;
+            height: 28px;
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 0.85rem;
+        }
+        
+        .dir-structure {
+            font-family: 'Roboto Mono', monospace;
+            margin: 12px 0;
+            font-size: 0.75rem;
+            line-height: 1.3;
+        }
+        
+        .dir-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1px;
+        }
+        
+        .dir-icon {
+            margin-right: 8px;
+            color: var(--primary-color);
+            width: 16px;
+            text-align: center;
+        }
+        
+        .dir-folder {
+            color: var(--primary-color);
+            font-weight: 500;
+        }
+        
+        .dir-file {
+            color: var(--text-color);
+        }
+        
+        .dir-comment {
+            color: #666;
+            margin-left: 8px;
+            font-size: 0.75rem;
+        }
+        
+        .security-layer {
+            margin: 2px 0;
+            padding: 6px;
+            text-align: center;
+            color: white;
+            font-weight: 500;
+            border-radius: 4px;
+            font-size: 0.85rem;
+        }
+        
+        @media print {
+            body {
+                background-color: white;
+            }
+            
+            .slide {
+                box-shadow: none;
+                border: 1px solid #ddd;
+                page-break-after: always;
+                margin: 0;
+                padding-top: 40px;
+            }
+        }
+        
+        .logo-container {
+            background-color: white;
+            border-radius: 50%;
+            width: 180px;
+            height: 180px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 25px;
+            overflow: hidden;
+        }
+        
+        .large-logo {
+            width: 160px;
+            height: auto;
+        }
+        
+        .text-gradient {
+            background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .version-tag {
+            display: inline-block;
+            background-color: var(--primary-color);
+            color: white;
+            font-size: 0.8rem;
+            padding: 3px 10px;
+            border-radius: 15px;
+            margin-top: 10px;
+        }
+
+        /* Classe específica para os slides que precisam de mais espaço para o conteúdo */
+        .compact-content h3 {
+            margin-bottom: 4px;
+        }
+
+        .compact-content ul, 
+        .compact-content ol {
+            margin-bottom: 6px;
+        }
+
+        .compact-content li {
+            margin-bottom: 1px;
+        }
+
+        .compact-content p {
+            margin-bottom: 5px;
+        }
+
+        /* Ajustes adicionais para textos em cards */
+        .card p, .box p {
+            margin-bottom: 4px;
+        }
+
+        /* Reduzir o espaço entre os elementos em geral */
+        .box {
+            margin-bottom: 10px;
+        }
+
+        .card {
+            margin-bottom: 10px;
+        }
+
+        /* Adicionar a classe compact-content em mais slides */
+        .slide-8 .slide-content,
+        .slide-11 .slide-content,
+        .slide-12 .slide-content,
+        .slide-13 .slide-content,
+        .slide-14 .slide-content,
+        .slide-17 .slide-content,
+        .slide-18 .slide-content {
+            height: auto;
+            min-height: 450px;
+            max-height: 550px;
+            overflow: visible;
+        }
+
+        /* Garantir que todos os slides tenham conteúdo completamente visível */
+        .slide-content {
+            height: auto !important;
+            min-height: 450px !important;
+            max-height: 550px !important;
+            overflow: visible !important;
+        }
+
+        /* Garantir que todos os blocos de código sejam exibidos completamente */
+        pre {
+            font-size: 0.65rem !important;
+            line-height: 1.2 !important;
+            padding: 8px !important;
+            max-height: none !important;
+            overflow: visible !important;
+        }
+
+        /* Reduzir tamanho de texto para todos os slides de forma consistente */
+        .slide {
+            font-size: 0.95rem;
+        }
+
+        .card, .box {
+            max-height: none !important;
+            overflow: visible !important;
+            padding: 10px !important;
+        }
+
+        /* Reduzir distâncias e espaçamentos */
+        h3 {
+            margin-bottom: 5px !important;
+        }
+
+        ul, ol {
+            margin-bottom: 8px !important;
+        }
+
+        li {
+            margin-bottom: 2px !important;
+        }
+
+        p {
+            margin-bottom: 5px !important;
+        }
+
+        /* Estilos específicos para o sumário */
+        .sumario-box {
+            background-color: rgba(26, 95, 180, 0.05);
+            border: 1px solid rgba(26, 95, 180, 0.1);
+            border-radius: 8px;
+            padding: 15px 20px;
+            position: relative;
+            transition: var(--transition);
+            height: auto;
+            overflow: visible;
+        }
+
+        .sumario-box:hover {
+            background-color: rgba(26, 95, 180, 0.08);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(26, 95, 180, 0.08);
+        }
+
+        .sumario-box ol {
+            margin: 0;
+            padding-left: 30px;
+        }
+
+        .sumario-box li {
+            font-size: 0.95rem;
+            line-height: 1.35;
+            margin-bottom: 6px;
+            padding-left: 5px;
+        }
+
+        .sumario-box i {
+            color: var(--primary-color);
+            margin-right: 5px;
+            width: 16px;
+            text-align: center;
+        }
+
+        /* Ajuste especial para o slide de sumário */
+        #slide-sumario .slide-content {
+            height: auto;
+            min-height: 400px;
+        }
+
+        /* Ajustes específicos para a estrutura de diretórios no slide 3 */
+        .slide-3 .dir-structure {
+            font-size: 0.7rem !important;
+            line-height: 1.2 !important;
+            margin: 8px 0 !important;
+        }
+
+        .slide-3 .dir-item {
+            margin-bottom: 1px !important;
+            padding-left: 20px !important;
+        }
+
+        .slide-3 .dir-comment {
+            font-size: 0.65rem !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="slides-container">
+        <!-- Slide 1: Capa -->
+        <div class="slide">
+            <div class="slide-header"></div>
+            <div class="flex-center">
+                <div class="logo-container">
+                    <img src="CyberGo.jpg" alt="CyberGo Logo" class="large-logo">
+                </div>
+                <h1>Documentação Técnica</h1>
+                <h2 class="text-gradient" style="margin-top: 0;">CyberGo</h2>
+                <p style="margin-top: 20px; color: #666;">Sistema de Gestão Integrado</p>
+                <span class="version-tag">Versão 1.0 - Abril/2025</span>
+            </div>
+            <div class="slide-number">01</div>
+        </div>
+        
+        <!-- Slide 2: Sumário -->
+        <div id="slide-sumario" class="slide">
+            <div class="slide-header"></div>
+            <h2 class="slide-title"><i class="fas fa-list"></i> Sumário</h2>
+            <div class="slide-content">
+                <div class="columns">
+                    <div class="column">
+                        <div class="sumario-box">
+                            <ol>
+                                <li><i class="fas fa-layer-group"></i> Arquitetura do Sistema</li>
+                                <li><i class="fas fa-database"></i> Camada de Modelos (Models)</li>
+                                <li><i class="fas fa-shield-alt"></i> Segurança</li>
+                                <li><i class="fas fa-eye"></i> Camada de Visão (Views)</li>
+                                <li><i class="fas fa-filter"></i> Middlewares e Extensões</li>
+                                <li><i class="fas fa-puzzle-piece"></i> Funcionalidades Técnicas</li>
+                                <li><i class="fas fa-window-maximize"></i> Interfaces do Sistema</li>
+                                <li><i class="fas fa-user-shield"></i> Personalização do Admin Django</li>
+                                <li><i class="fas fa-server"></i> Estrutura do Banco de Dados</li>
+                                <li><i class="fas fa-tachometer-alt"></i> Estratégias de Otimização</li>
+                            </ol>
+                        </div>
+                    </div>
+                    <div class="column">
+                        <div class="sumario-box">
+                            <ol start="11">
+                                <li><i class="fas fa-cubes"></i> Gerenciamento de Dependências</li>
+                                <li><i class="fas fa-exchange-alt"></i> Fluxos Técnicos Detalhados</li>
+                                <li><i class="fas fa-exclamation-triangle"></i> Tratamento de Erros</li>
+                                <li><i class="fas fa-vial"></i> Testes</li>
+                                <li><i class="fas fa-rocket"></i> Implantação e DevOps</li>
+                                <li><i class="fas fa-code"></i> Convenções de Código</li>
+                                <li><i class="fas fa-book"></i> Glossário Técnico</li>
+                                <li><i class="fas fa-flag-checkered"></i> Considerações Finais</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <img src="CyberGo.jpg" alt="CyberGo Logo" class="slide-logo">
+            <div class="slide-number">02</div>
+        </div>
+        
+        <!-- Slide 3: Arquitetura do Sistema -->
+        <div class="slide">
+            <div class="slide-header"></div>
+            <h2 class="slide-title"><i class="fas fa-layer-group"></i> Arquitetura do Sistema</h2>
+            <div class="slide-content">
+                <div class="columns">
+                    <div class="column">
+                        <div class="card">
+                            <h3><i class="fas fa-sitemap"></i> Visão Geral</h3>
+                            <p>O CyberGo utiliza o framework Django, seguindo o padrão MTV:</p>
+                            <ul>
+                                <li><strong><i class="fas fa-database"></i> Model</strong>: Camada de dados</li>
+                                <li><strong><i class="fas fa-file-code"></i> Template</strong>: Camada de apresentação</li>
+                                <li><strong><i class="fas fa-cogs"></i> View</strong>: Camada de lógica de negócios</li>
+                            </ul>
+                            
+                            <h3 style="margin-top: 25px;"><i class="fas fa-laptop-code"></i> Tecnologias Utilizadas</h3>
+                            <ul>
+                                <li><i class="fab fa-python"></i> Python 3.8+ com Django 5.1.x</li>
+                                <li><i class="fas fa-database"></i> SQLite (desenvolvimento)</li>
+                                <li><i class="fab fa-html5"></i> <i class="fab fa-css3-alt"></i> <i class="fab fa-js"></i> Bootstrap 5, HTML5, CSS3, JavaScript</li>
+                                <li><i class="fas fa-plug"></i> django-crispy-forms, django-import-export...</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="column">
+                        <div class="card">
+                            <h3><i class="fas fa-folder-tree"></i> Estrutura de Diretórios</h3>
+                            <div class="dir-structure">
+                                <div class="dir-item">
+                                    <span class="dir-icon"><i class="fas fa-folder-open"></i></span>
+                                    <span class="dir-folder">Projeto Operacional/</span>
+                                </div>
+                                <div class="dir-item" style="padding-left: 20px;">
+                                    <span class="dir-icon"><i class="fas fa-folder"></i></span>
+                                    <span class="dir-folder">config/</span>
+                                    <span class="dir-comment"># Configurações Django</span>
+                                </div>
+                                <div class="dir-item" style="padding-left: 20px;">
+                                    <span class="dir-icon"><i class="fas fa-folder"></i></span>
+                                    <span class="dir-folder">core/</span>
+                                    <span class="dir-comment"># Aplicativo principal</span>
+                                </div>
+                                <div class="dir-item" style="padding-left: 20px;">
+                                    <span class="dir-icon"><i class="fas fa-folder"></i></span>
+                                    <span class="dir-folder">escolas/</span>
+                                    <span class="dir-comment"># Gestão de escolas</span>
+                                </div>
+                                <div class="dir-item" style="padding-left: 20px;">
+                                    <span class="dir-icon"><i class="fas fa-folder"></i></span>
+                                    <span class="dir-folder">pedidos/</span>
+                                    <span class="dir-comment"># Gestão de pedidos</span>
+                                </div>
+                                <div class="dir-item" style="padding-left: 20px;">
+                                    <span class="dir-icon"><i class="fas fa-folder"></i></span>
+                                    <span class="dir-folder">produtos/</span>
+                                    <span class="dir-comment"># Gestão de produtos</span>
+                                </div>
+                                <div class="dir-item" style="padding-left: 20px;">
+                                    <span class="dir-icon"><i class="fas fa-folder"></i></span>
+                                    <span class="dir-folder">static/</span>
+                                    <span class="dir-comment"># Arquivos estáticos</span>
+                                </div>
+                                <div class="dir-item" style="padding-left: 20px;">
+                                    <span class="dir-icon"><i class="fas fa-folder"></i></span>
+                                    <span class="dir-folder">templates/</span>
+                                    <span class="dir-comment"># Templates HTML</span>
+                                </div>
+                                <div class="dir-item" style="padding-left: 20px;">
+                                    <span class="dir-icon"><i class="fas fa-folder"></i></span>
+                                    <span class="dir-folder">media/</span>
+                                    <span class="dir-comment"># Uploads de usuários</span>
+                                </div>
+                                <div class="dir-item" style="padding-left: 20px;">
+                                    <span class="dir-icon"><i class="fas fa-file-code"></i></span>
+                                    <span class="dir-file">manage.py</span>
+                                    <span class="dir-comment"># Script de gerenciamento</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <img src="CyberGo.jpg" alt="CyberGo Logo" class="slide-logo">
+            <div class="slide-number">03</div>
+        </div>
+        
+        <!-- Slide 4: Modelos -->
+        <div class="slide">
+            <div class="slide-header"></div>
+            <h2 class="slide-title"><i class="fas fa-database"></i> Camada de Modelos (Models)</h2>
+            <div class="slide-content">
+                <h3><i class="fas fa-project-diagram"></i> Entidades Principais</h3>
+                <div class="columns">
+                    <div class="column">
+                        <div class="box">
+                            <h3><i class="fas fa-building"></i> Empresa</h3>
+                            <ul>
+                                <li><i class="fas fa-key"></i> id (PK)</li>
+                                <li><i class="fas fa-font"></i> nome, cnpj, endereco</li>
+                                <li><i class="fas fa-phone"></i> telefone, email, contato</li>
+                                <li><i class="fas fa-calendar"></i> data_cadastro, ativo</li>
+                                <li><i class="fas fa-arrow-right"></i> → Contratos</li>
+                            </ul>
+                        </div>
+                        <div class="box">
+                            <h3><i class="fas fa-school"></i> Escola</h3>
+                            <ul>
+                                <li><i class="fas fa-key"></i> id (PK)</li>
+                                <li><i class="fas fa-font"></i> nome, codigo, lote</li>
+                                <li><i class="fas fa-money-bill"></i> budget, data_validade</li>
+                                <li><i class="fas fa-user-tie"></i> supervisor_id</li>
+                                <li><i class="fas fa-arrow-right"></i> → Pedidos</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="column">
+                        <div class="box">
+                            <h3><i class="fas fa-shopping-cart"></i> Pedido</h3>
+                            <ul>
+                                <li><i class="fas fa-key"></i> id (PK)</li>
+                                <li><i class="fas fa-school"></i> escola_id</li>
+                                <li><i class="fas fa-calendar-alt"></i> data_solicitacao, data_aprovacao</li>
+                                <li><i class="fas fa-truck"></i> data_envio, data_entrega</li>
+                                <li><i class="fas fa-tag"></i> status, observacoes</li>
+                                <li><i class="fas fa-arrow-right"></i> → ItemPedido, PedidoLog</li>
+                            </ul>
+                        </div>
+                        <div class="box">
+                            <h3><i class="fas fa-box"></i> Produto</h3>
+                            <ul>
+                                <li><i class="fas fa-key"></i> id (PK)</li>
+                                <li><i class="fas fa-font"></i> nome, descricao</li>
+                                <li><i class="fas fa-dollar-sign"></i> valor_unitario, unidade_medida</li>
+                                <li><i class="fas fa-barcode"></i> codigo, data_cadastro, ativo</li>
+                                <li><i class="fas fa-arrow-right"></i> → ItemPedido</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <img src="CyberGo.jpg" alt="CyberGo Logo" class="slide-logo">
+            <div class="slide-number">04</div>
+        </div>
+        
+        <!-- Slide 5: Segurança -->
+        <div class="slide">
+            <div class="slide-header"></div>
+            <h2 class="slide-title"><i class="fas fa-shield-alt"></i> Segurança</h2>
+            <div class="slide-content">
+                <div class="columns">
+                    <div class="column">
+                        <div class="card">
+                            <h3><i class="fas fa-user-shield"></i> Proteção CSRF</h3>
+                            <pre>@require_POST
+@csrf_protect
+def operacao_sensivel(request):
+    # Implementação segura...</pre>
+                            <p>Todas as views que alteram dados utilizam proteção CSRF através de decoradores ou formulários.</p>
+                            
+                            <h3 style="margin-top: 15px;"><i class="fas fa-filter"></i> Validação de Entrada</h3>
+                            <pre>def validar_entrada(pedido_id):
+    try:
+        pedido_id = int(pedido_id)
+        if pedido_id <= 0:
+            raise ValueError("ID inválido")
+        return pedido_id
+    except (ValueError, TypeError):
+        raise ValueError("ID de pedido inválido")</pre>
+                        </div>
+                    </div>
+                    <div class="column">
+                        <div class="card">
+                            <h3><i class="fas fa-layer-group"></i> Camadas de Segurança</h3>
+                            <div style="margin-top: 15px;">
+                                <div class="security-layer" style="background-color: var(--primary-color);">
+                                    <i class="fas fa-user-lock"></i> Autenticação de Usuário
+                                </div>
+                                <div class="security-layer" style="background-color: rgba(26, 95, 180, 0.9);">
+                                    <i class="fas fa-users-cog"></i> Permissões de Grupo
+                                </div>
+                                <div class="security-layer" style="background-color: rgba(26, 95, 180, 0.8);">
+                                    <i class="fas fa-user-tag"></i> Permissões de Usuário
+                                </div>
+                                <div class="security-layer" style="background-color: rgba(26, 95, 180, 0.7);">
+                                    <i class="fas fa-eye-slash"></i> Permissões de View (Decoradores)
+                                </div>
+                                <div class="security-layer" style="background-color: rgba(26, 95, 180, 0.6);">
+                                    <i class="fas fa-cube"></i> Permissões de Objeto
+                                </div>
+                                <div class="security-layer" style="background-color: rgba(26, 95, 180, 0.5);">
+                                    <i class="fas fa-check-circle"></i> Validação de Formulários
+                                </div>
+                            </div>
+                            
+                            <div class="note" style="margin-top: 20px;">
+                                <p><strong>Importante:</strong> O CyberGo implementa múltiplas camadas de segurança para proteger dados sensíveis e garantir que cada usuário acesse apenas as informações e funcionalidades autorizadas.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <img src="CyberGo.jpg" alt="CyberGo Logo" class="slide-logo">
+            <div class="slide-number">05</div>
+        </div>
+        
+        <!-- Slide 6: Camada de Visão (Views) -->
+        <div class="slide">
+            <div class="slide-header"></div>
+            <h2 class="slide-title"><i class="fas fa-eye"></i> Camada de Visão (Views)</h2>
+            <div class="slide-content compact-content">
+                <div class="columns">
+                    <div class="column">
+                        <div class="card">
+                            <h3><i class="fas fa-exchange-alt"></i> Views Principais</h3>
+                            <ul>
+                                <li><i class="fas fa-home"></i> <code>DashboardView</code> - Painel principal</li>
+                                <li><i class="fas fa-clipboard-list"></i> <code>PedidoListView</code> - Listagem de pedidos</li>
+                                <li><i class="fas fa-plus-circle"></i> <code>PedidoCreateView</code> - Criação de pedidos</li>
+                                <li><i class="fas fa-edit"></i> <code>EscolaUpdateView</code> - Atualização de escolas</li>
+                                <li><i class="fas fa-chart-bar"></i> <code>RelatorioView</code> - Relatórios gerenciais</li>
+                            </ul>
+                            
+                            <h3 style="margin-top: 15px;"><i class="fas fa-cogs"></i> Padrões de Implementação</h3>
+                            <ul>
+                                <li>Views baseadas em classe (CBV)</li>
+                                <li>Mixins para funcionalidades compartilhadas</li>
+                                <li>Decoradores para controle de acesso</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="column">
+                        <div class="card">
+                            <h3><i class="fas fa-code"></i> Exemplo: View de Relatório</h3>
+                            <pre>@method_decorator(login_required, name='dispatch')
+class RelatorioView(PermissionRequiredMixin, View):
+    permission_required = 'pedidos.view_relatorio'
+    
+    def get(self, request):
+        form = FiltroRelatorioForm()
+        return render(request, 'relatorios.html', 
+                     {'form': form})
+    
+    def post(self, request):
+        form = FiltroRelatorioForm(request.POST)
+        if form.is_valid():
+            dados = gerar_relatorio(
+                form.cleaned_data)
+            return render(request, 'relatorios.html', 
+                         {'form': form, 'dados': dados})
+        return render(request, 'relatorios.html', 
+                     {'form': form})</pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <img src="CyberGo.jpg" alt="CyberGo Logo" class="slide-logo">
+            <div class="slide-number">06</div>
+        </div>
+        
+        <!-- Slide 7: Middlewares e Extensões -->
+        <div class="slide">
+            <div class="slide-header"></div>
+            <h2 class="slide-title"><i class="fas fa-filter"></i> Middlewares e Extensões</h2>
+            <div class="slide-content compact-content">
+                <div class="columns">
+                    <div class="column">
+                        <div class="card slide-7">
+                            <h3><i class="fas fa-cog"></i> Middleware Personalizado</h3>
+                            <pre>class PerfilAcessoMiddleware:
+    def __init__(self, get_response):
+        self.get_response = get_response
+        
+    def __call__(self, request):
+        if request.user.is_authenticated:
+            perfil = request.user.perfil
+            request.perfil_acesso = perfil.tipo
+            
+            # Verifica restrições de acesso
+            if perfil.is_restricted and not self.is_allowed_path(request.path):
+                return redirect('acesso_negado')
+                
+        return self.get_response(request)</pre>
+                            <p>Implementa verificação de acesso baseada no perfil do usuário.</p>
+                        </div>
+                    </div>
+                    <div class="column">
+                        <div class="card slide-7">
+                            <h3><i class="fas fa-tags"></i> Template Tags Personalizadas</h3>
+                            <pre>@register.filter
+def format_currency(value):
+    """Formata um valor para moeda brasileira"""
+    if value is None:
+        return "R$ 0,00"
+    return f"R$ {value:.2f}".replace('.', ',')</pre>
+                            
+                            <pre>@register.simple_tag
+def is_menu_active(request, pattern):
+    """Verifica se um item de menu está ativo"""
+    if pattern in request.path:
+        return "active"
+    return ""</pre>
+                            
+                            <div class="note">
+                                <p>Tags e filtros permitem estender templates com funcionalidades específicas.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <img src="CyberGo.jpg" alt="CyberGo Logo" class="slide-logo">
+            <div class="slide-number">07</div>
+        </div>
+        
+        <!-- Slide 8: Funcionalidades Técnicas -->
+        <div class="slide">
+            <div class="slide-header"></div>
+            <h2 class="slide-title"><i class="fas fa-puzzle-piece"></i> Funcionalidades Técnicas</h2>
+            <div class="slide-content compact-content">
+                <div class="columns">
+                    <div class="column">
+                        <div class="box">
+                            <h3><i class="fas fa-database"></i> Sistema de Backup e Restauração</h3>
+                            <ul>
+                                <li>Backups automáticos diários</li>
+                                <li>Exportação de dados em JSON e CSV</li>
+                                <li>Interface de admin para restauração</li>
+                                <li>Histórico de backups acessível</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="box">
+                            <h3><i class="fas fa-chart-line"></i> Dashboard e Relatórios</h3>
+                            <ul>
+                                <li>Processamento assíncrono de dados</li>
+                                <li>Exportação para Excel/PDF</li>
+                                <li>Filtros dinâmicos</li>
+                                <li>Gráficos interativos com Chart.js</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="column">
+                        <div class="box">
+                            <h3><i class="fas fa-history"></i> Sistema de Log</h3>
+                            <ul>
+                                <li>Registro de operações críticas</li>
+                                <li>Trilha de auditoria completa</li>
+                                <li>Registro de acesso e autenticação</li>
+                                <li>Alertas para ações sensíveis</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="box">
+                            <h3><i class="fas fa-bell"></i> Sistema de Notificações</h3>
+                            <ul>
+                                <li>Notificações por e-mail</li>
+                                <li>Notificações no sistema (tempo real)</li>
+                                <li>Alertas para aprovação de pedidos</li>
+                                <li>Lembretes de prazos e orçamentos</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <img src="CyberGo.jpg" alt="CyberGo Logo" class="slide-logo">
+            <div class="slide-number">08</div>
+        </div>
+        
+        <!-- Slide 9: Interfaces do Sistema -->
+        <div class="slide">
+            <div class="slide-header"></div>
+            <h2 class="slide-title"><i class="fas fa-window-maximize"></i> Interfaces do Sistema</h2>
+            <div class="slide-content">
+                <div class="columns">
+                    <div class="column">
+                        <div class="card">
+                            <h3><i class="fas fa-users"></i> Perfis de Usuário</h3>
+                            <table>
+                                <tr>
+                                    <th>Perfil</th>
+                                    <th>Funcionalidades</th>
+                                </tr>
+                                <tr>
+                                    <td><i class="fas fa-user-tie"></i> Administrador</td>
+                                    <td>Acesso completo ao sistema</td>
+                                </tr>
+                                <tr>
+                                    <td><i class="fas fa-user-cog"></i> Gerente</td>
+                                    <td>Aprovação de pedidos, relatórios</td>
+                                </tr>
+                                <tr>
+                                    <td><i class="fas fa-user-graduate"></i> Supervisor</td>
+                                    <td>Gestão de escolas, acompanhamento</td>
+                                </tr>
+                                <tr>
+                                    <td><i class="fas fa-user"></i> Operador</td>
+                                    <td>Entrada de dados, consultas básicas</td>
+                                </tr>
+                                <tr>
+                                    <td><i class="fas fa-school"></i> Escola</td>
+                                    <td>Solicitação de pedidos, consultas</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="column">
+                        <div class="card">
+                            <h3><i class="fas fa-desktop"></i> Telas Principais</h3>
+                            <ul>
+                                <li><i class="fas fa-tachometer-alt"></i> <strong>Dashboard</strong>: Visão consolidada do sistema</li>
+                                <li><i class="fas fa-clipboard-list"></i> <strong>Gestão de Pedidos</strong>: CRUD completo</li>
+                                <li><i class="fas fa-school"></i> <strong>Cadastro de Escolas</strong>: Formulários validados</li>
+                                <li><i class="fas fa-box"></i> <strong>Cadastro de Produtos</strong>: Com imagens</li>
+                                <li><i class="fas fa-chart-bar"></i> <strong>Relatórios</strong>: Filtros avançados</li>
+                            </ul>
+                            
+                            <div class="note" style="margin-top: 20px;">
+                                <p>A interface do CyberGo é responsiva, adaptando-se a diferentes tamanhos de tela e dispositivos, seguindo práticas modernas de UX/UI.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <img src="CyberGo.jpg" alt="CyberGo Logo" class="slide-logo">
+            <div class="slide-number">09</div>
+        </div>
+        
+        <!-- Slide 10: Personalização do Admin Django -->
+        <div class="slide">
+            <div class="slide-header"></div>
+            <h2 class="slide-title"><i class="fas fa-user-shield"></i> Personalização do Admin Django</h2>
+            <div class="slide-content compact-content">
+                <div class="columns">
+                    <div class="column">
+                        <div class="card slide-10">
+                            <h3><i class="fas fa-cogs"></i> Personalização da Interface</h3>
+                            <pre>@admin.register(Escola)
+class EscolaAdmin(admin.ModelAdmin):
+    list_display = ('nome', 'codigo', 'lote', 
+                   'supervisor', 'budget_display')
+    list_filter = ('lote', 'supervisor')
+    search_fields = ('nome', 'codigo')
+    readonly_fields = ('data_cadastro',)
+    
+    def budget_display(self, obj):
+        return f"R$ {obj.budget:.2f}"
+    
+    budget_display.short_description = "Orçamento"</pre>
+                            <p>Classes de Admin personalizadas para cada modelo, com configurações de exibição, filtros, busca e campos de leitura.</p>
+                        </div>
+                    </div>
+                    <div class="column">
+                        <div class="card slide-10">
+                            <h3><i class="fas fa-lock"></i> Ações Administrativas</h3>
+                            <pre>def aprovar_pedidos(modeladmin, request, queryset):
+    for pedido in queryset:
+        if pedido.status == 'PENDENTE':
+            pedido.aprovar(usuario=request.user)
+    
+    modeladmin.message_user(
+        request,
+        f"{queryset.count()} pedidos aprovados com sucesso!",
+        messages.SUCCESS
+    )
+
+aprovar_pedidos.short_description = "Aprovar pedidos selecionados"</pre>
+                            <p>Ações personalizadas no admin para operações em lote, como aprovação de pedidos, exportação de dados e geração de relatórios.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <img src="CyberGo.jpg" alt="CyberGo Logo" class="slide-logo">
+            <div class="slide-number">10</div>
+        </div>
+        
+        <!-- Slide 11: Estrutura do Banco de Dados -->
+        <div class="slide">
+            <div class="slide-header"></div>
+            <h2 class="slide-title"><i class="fas fa-server"></i> Estrutura do Banco de Dados</h2>
+            <div class="slide-content compact-content">
+                <div class="columns">
+                    <div class="column">
+                        <div class="box">
+                            <h3><i class="fas fa-key"></i> Índices e Chaves</h3>
+                            <ul>
+                                <li><strong>Índices primários</strong>: Em todas as tabelas (id)</li>
+                                <li><strong>Índices secundários</strong>: Campos de busca frequente</li>
+                                <li><strong>Chaves estrangeiras</strong>: Relacionamentos com integridade referencial</li>
+                                <li><strong>Índices compostos</strong>: Para consultas específicas</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="box">
+                            <h3><i class="fas fa-history"></i> Histórico e Auditoria</h3>
+                            <ul>
+                                <li>Tabelas de log para operações críticas</li>
+                                <li>Registro de alterações sensíveis</li>
+                                <li>Campos de timestamps em todos os modelos</li>
+                                <li>Campos para usuário de criação/modificação</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="column">
+                        <div class="box">
+                            <h3><i class="fas fa-cubes"></i> Estratégia de Migrações</h3>
+                            <ul>
+                                <li>Migrações incrementais versionadas</li>
+                                <li>Scripts de migração para operações complexas</li>
+                                <li>Migrações de dados para preservar histórico</li>
+                                <li>Estratégia de rollback para emergências</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="box">
+                            <h3><i class="fas fa-database"></i> Configuração de Banco</h3>
+                            <pre># settings.py
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.environ.get('DB_NAME', 'cybergo'),
+        'USER': os.environ.get('DB_USER', 'cybergo_user'),
+        'PASSWORD': os.environ.get('DB_PASSWORD'),
+        'HOST': os.environ.get('DB_HOST', 'localhost'),
+        'PORT': os.environ.get('DB_PORT', '5432'),
+        'CONN_MAX_AGE': 600,
+    }
+}</pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <img src="CyberGo.jpg" alt="CyberGo Logo" class="slide-logo">
+            <div class="slide-number">11</div>
+        </div>
+        
+        <!-- Slide 12: Estratégias de Otimização -->
+        <div class="slide">
+            <div class="slide-header"></div>
+            <h2 class="slide-title"><i class="fas fa-tachometer-alt"></i> Estratégias de Otimização</h2>
+            <div class="slide-content compact-content">
+                <div class="columns">
+                    <div class="column">
+                        <div class="card">
+                            <h3><i class="fas fa-database"></i> Otimização de Consultas</h3>
+                            <ul>
+                                <li><i class="fas fa-check"></i> <strong>select_related()</strong>: Para relações ForeignKey</li>
+                                <li><i class="fas fa-check"></i> <strong>prefetch_related()</strong>: Para relações ManyToMany</li>
+                                <li><i class="fas fa-check"></i> <strong>Bulk operations</strong>: Para operações em lote</li>
+                                <li><i class="fas fa-check"></i> <strong>Paginação</strong>: Para conjuntos grandes de dados</li>
+                            </ul>
+                            
+                            <pre>def listar_pedidos(request):
+    # Carrega escola e itens em uma única consulta
+    pedidos = Pedido.objects.select_related('escola')\
+              .prefetch_related('itens__produto')\
+              .filter(status='APROVADO')\
+              .order_by('-data_solicitacao')</pre>
+                        </div>
+                    </div>
+                    <div class="column">
+                        <div class="card">
+                            <h3><i class="fas fa-bolt"></i> Estratégias de Cache</h3>
+                            <ul>
+                                <li><i class="fas fa-layer-group"></i> <strong>Cache de página</strong>: Para páginas estáticas</li>
+                                <li><i class="fas fa-cube"></i> <strong>Cache de fragmento</strong>: Para partes da página</li>
+                                <li><i class="fas fa-database"></i> <strong>Cache de consulta</strong>: Para consultas complexas</li>
+                                <li><i class="fas fa-server"></i> <strong>Redis</strong>: Para cache distribuído</li>
+                            </ul>
+                            
+                            <pre># Cache para relatórios pesados
+@cache_page(60 * 15)  # 15 minutos
+def relatorio_mensal(request, ano, mes):
+    # Processamento pesado...
+    return render(request, 'relatorio.html', 
+                 {'dados': dados_relatorio})</pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <img src="CyberGo.jpg" alt="CyberGo Logo" class="slide-logo">
+            <div class="slide-number">12</div>
+        </div>
+        
+        <!-- Slide 13: Gerenciamento de Dependências -->
+        <div class="slide">
+            <div class="slide-header"></div>
+            <h2 class="slide-title"><i class="fas fa-cubes"></i> Gerenciamento de Dependências</h2>
+            <div class="slide-content compact-content">
+                <div class="columns">
+                    <div class="column">
+                        <div class="card">
+                            <h3><i class="fas fa-file-alt"></i> Requirements.txt</h3>
+                            <pre>Django==5.1.0
+Pillow==10.0.0
+django-crispy-forms==2.0
+django-import-export==3.2.0
+psycopg2-binary==2.9.6
+python-decouple==3.8
+dj-database-url==2.0.0
+gunicorn==21.2.0
+whitenoise==6.5.0
+django-debug-toolbar==4.2.0</pre>
+                            
+                            <div class="note">
+                                <p>Versões fixas para todas as dependências garantem ambiente consistente de desenvolvimento e produção.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="column">
+                        <div class="card">
+                            <h3><i class="fas fa-code-branch"></i> Ambiente Virtual</h3>
+                            <div class="steps">
+                                <li>Criação do ambiente virtual com <code>venv</code>
+                                    <pre>python -m venv venv</pre>
+                                </li>
+                                <li>Ativação do ambiente
+                                    <pre>source venv/bin/activate  # Linux/Mac
+venv\Scripts\activate  # Windows</pre>
+                                </li>
+                                <li>Instalação de dependências
+                                    <pre>pip install -r requirements.txt</pre>
+                                </li>
+                                <li>Congelamento de versões para distribuição
+                                    <pre>pip freeze > requirements.txt</pre>
+                                </li>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <img src="CyberGo.jpg" alt="CyberGo Logo" class="slide-logo">
+            <div class="slide-number">13</div>
+        </div>
+        
+        <!-- Slide 14: Fluxos Técnicos Detalhados -->
+        <div class="slide">
+            <div class="slide-header"></div>
+            <h2 class="slide-title"><i class="fas fa-exchange-alt"></i> Fluxos Técnicos Detalhados</h2>
+            <div class="slide-content compact-content">
+                <div class="columns">
+                    <div class="column">
+                        <div class="box">
+                            <h3><i class="fas fa-shopping-cart"></i> Fluxo de Pedido</h3>
+                            <ol>
+                                <li><strong>Criação</strong>: Escola inicia pedido (status: Rascunho)</li>
+                                <li><strong>Envio</strong>: Escola finaliza pedido (status: Pendente)</li>
+                                <li><strong>Aprovação</strong>: Supervisor avalia pedido
+                                    <ul>
+                                        <li>Se aprovado: status → Aprovado</li>
+                                        <li>Se rejeitado: status → Rejeitado</li>
+                                    </ul>
+                                </li>
+                                <li><strong>Processamento</strong>: Operador prepara pedido (status: Em Processamento)</li>
+                                <li><strong>Envio</strong>: Logística envia pedido (status: Enviado)</li>
+                                <li><strong>Entrega</strong>: Escola confirma recebimento (status: Entregue)</li>
+                            </ol>
+                        </div>
+                    </div>
+                    <div class="column">
+                        <div class="box">
+                            <h3><i class="fas fa-user-plus"></i> Fluxo de Cadastro de Escola</h3>
+                            <ol>
+                                <li><strong>Registro inicial</strong>: Dados básicos da escola</li>
+                                <li><strong>Atribuição de supervisor</strong>: Um supervisor é designado</li>
+                                <li><strong>Definição de orçamento</strong>: Budget é configurado</li>
+                                <li><strong>Credenciais</strong>: Sistema gera credenciais de acesso</li>
+                                <li><strong>Notificação</strong>: E-mail enviado com instruções</li>
+                                <li><strong>Primeiro acesso</strong>: Escola define senha permanente</li>
+                            </ol>
+                            
+                            <div class="note" style="margin-top: 15px;">
+                                <p>Todos os fluxos incorporam hooks para auditoria, validações em múltiplas camadas, e sistema de recuperação em caso de falhas.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <img src="CyberGo.jpg" alt="CyberGo Logo" class="slide-logo">
+            <div class="slide-number">14</div>
+        </div>
+        
+        <!-- Slide 15: Tratamento de Erros -->
+        <div class="slide">
+            <div class="slide-header"></div>
+            <h2 class="slide-title"><i class="fas fa-exclamation-triangle"></i> Tratamento de Erros</h2>
+            <div class="slide-content compact-content">
+                <div class="columns">
+                    <div class="column">
+                        <div class="card slide-15">
+                            <h3><i class="fas fa-exclamation-circle"></i> Estratégia de Tratamento</h3>
+                            <ul>
+                                <li><strong>Validação preventiva</strong>: Formulários e serializers</li>
+                                <li><strong>Exceções específicas</strong>: Classes customizadas</li>
+                                <li><strong>Handlers globais</strong>: Para erros 404, 500</li>
+                                <li><strong>Logs estruturados</strong>: Registro detalhado</li>
+                                <li><strong>Mensagens amigáveis</strong>: Para usuários finais</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="card">
+                            <h3><i class="fas fa-life-ring"></i> Páginas de Erro</h3>
+                            <pre>handler404 = 'core.views.error_404'
+handler500 = 'core.views.error_500'
+handler403 = 'core.views.error_403'</pre>
+                            <p>Páginas personalizadas com instruções claras para o usuário.</p>
+                        </div>
+                    </div>
+                    <div class="column">
+                        <div class="card slide-15 code-slide">
+                            <h3><i class="fas fa-code"></i> Exemplo: Tratamento de Exceção</h3>
+                            <pre>class PedidoExcedeLimiteError(Exception):
+    """Erro quando pedido excede limite orçamentário"""
+    pass
+
+def criar_pedido(request):
+    try:
+        # Lógica de criação de pedido
+        if valor_total > escola.budget_disponivel:
+            raise PedidoExcedeLimiteError(
+                "Pedido excede o limite orçamentário")
+        
+        # Continua processamento normal
+        return redirect('pedido_sucesso')
+        
+    except PedidoExcedeLimiteError as e:
+        messages.error(request, str(e))
+        logger.warning(
+            f"Tentativa acima do limite: {request.user}")
+        return render(request, 'pedido_form.html', 
+                     {'form': form, 'erro': e})</pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <img src="CyberGo.jpg" alt="CyberGo Logo" class="slide-logo">
+            <div class="slide-number">15</div>
+        </div>
+        
+        <!-- Slide 16: Testes -->
+        <div class="slide">
+            <div class="slide-header"></div>
+            <h2 class="slide-title"><i class="fas fa-vial"></i> Testes</h2>
+            <div class="slide-content compact-content">
+                <div class="columns">
+                    <div class="column">
+                        <div class="card">
+                            <h3><i class="fas fa-layer-group"></i> Níveis de Teste</h3>
+                            <ul>
+                                <li><i class="fas fa-cube"></i> <strong>Testes Unitários</strong>: Funções isoladas</li>
+                                <li><i class="fas fa-cubes"></i> <strong>Testes de Integração</strong>: Interação</li>
+                                <li><i class="fas fa-window-maximize"></i> <strong>Testes de Interface</strong>: UI</li>
+                                <li><i class="fas fa-cogs"></i> <strong>Testes de Sistema</strong>: Funcionalidades</li>
+                            </ul>
+                            
+                            <div class="note" style="margin-top: 15px;">
+                                <p>Cobertura atual: 83% do código-fonte, com foco em componentes críticos.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="column">
+                        <div class="card slide-16 code-slide">
+                            <h3><i class="fas fa-code"></i> Exemplo de Teste</h3>
+                            <pre>class PedidoTestCase(TestCase):
+    def setUp(self):
+        # Configuração inicial para os testes
+        self.escola = Escola.objects.create(
+            nome="Escola Teste", budget=1000.00)
+        self.produto = Produto.objects.create(
+            nome="Produto Teste", valor_unitario=100.00)
+    
+    def test_criar_pedido_valido(self):
+        """Testa a criação de um pedido válido"""
+        pedido = Pedido.objects.create(
+            escola=self.escola, status="RASCUNHO")
+            
+        ItemPedido.objects.create(
+            pedido=pedido,
+            produto=self.produto,
+            quantidade=5)
+            
+        self.assertEqual(pedido.valor_total(), 500.00)
+        self.assertTrue(pedido.validar_orcamento())
+        pedido.atualizar_status("PENDENTE")
+        self.assertEqual(pedido.status, "PENDENTE")</pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <img src="CyberGo.jpg" alt="CyberGo Logo" class="slide-logo">
+            <div class="slide-number">16</div>
+        </div>
+        
+        <!-- Slide 17: Implantação e DevOps -->
+        <div class="slide">
+            <div class="slide-header"></div>
+            <h2 class="slide-title"><i class="fas fa-rocket"></i> Implantação e DevOps</h2>
+            <div class="slide-content compact-content">
+                <div class="columns">
+                    <div class="column">
+                        <div class="box">
+                            <h3><i class="fas fa-server"></i> Ambientes</h3>
+                            <ul>
+                                <li><i class="fas fa-laptop-code"></i> <strong>Desenvolvimento</strong>: Local</li>
+                                <li><i class="fas fa-vial"></i> <strong>Homologação</strong>: Testes</li>
+                                <li><i class="fas fa-globe"></i> <strong>Produção</strong>: Cliente final</li>
+                            </ul>
+                            
+                            <h3 style="margin-top: 10px;"><i class="fas fa-sync"></i> CI/CD</h3>
+                            <ul>
+                                <li>Testes automatizados em cada commit</li>
+                                <li>Build e deploy automatizados</li>
+                                <li>Validação de código (linting)</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="column">
+                        <div class="box">
+                            <h3><i class="fas fa-shield-alt"></i> Segurança na Implantação</h3>
+                            <ul>
+                                <li>Armazenamento seguro de credenciais</li>
+                                <li>HTTPS forçado em todos ambientes</li>
+                                <li>Backups automáticos</li>
+                            </ul>
+                            
+                            <h3 style="margin-top: 10px;"><i class="fas fa-cogs"></i> Configuração</h3>
+                            <pre># Configurações para produção
+DEBUG = False
+ALLOWED_HOSTS = ['cybergo.com.br']
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+SECURE_SSL_REDIRECT = True
+SESSION_COOKIE_SECURE = True</pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <img src="CyberGo.jpg" alt="CyberGo Logo" class="slide-logo">
+            <div class="slide-number">17</div>
+        </div>
+        
+        <!-- Slide 18: Convenções de Código e Glossário -->
+        <div class="slide">
+            <div class="slide-header"></div>
+            <h2 class="slide-title"><i class="fas fa-code"></i> Convenções e Glossário</h2>
+            <div class="slide-content compact-content">
+                <div class="columns">
+                    <div class="column">
+                        <div class="card code-slide">
+                            <h3><i class="fas fa-align-left"></i> Convenções de Código</h3>
+                            <ul>
+                                <li><strong>PEP 8</strong>: Padrão Python para estilo</li>
+                                <li><strong>Docstrings</strong>: Em todas classes e métodos</li>
+                                <li><strong>Type Hints</strong>: Anotações de tipo</li>
+                                <li><strong>Nomeação</strong>: snake_case para variáveis</li>
+                            </ul>
+                            
+                            <pre>def calcular_saldo_escola(
+    escola_id: int, 
+    data_referencia: Optional[date] = None) -> Decimal:
+    """
+    Calcula o saldo disponível da escola.
+    
+    Args:
+        escola_id: ID da escola
+        data_referencia: Data opcional
+        
+    Returns:
+        Saldo disponível em Decimal
+    """
+    # Implementação...</pre>
+                        </div>
+                    </div>
+                    <div class="column">
+                        <div class="card">
+                            <h3><i class="fas fa-book"></i> Glossário Técnico</h3>
+                            <table>
+                                <tr>
+                                    <th>Termo</th>
+                                    <th>Descrição</th>
+                                </tr>
+                                <tr>
+                                    <td>CBV</td>
+                                    <td>Class-Based Views</td>
+                                </tr>
+                                <tr>
+                                    <td>CSRF</td>
+                                    <td>Cross-Site Request Forgery</td>
+                                </tr>
+                                <tr>
+                                    <td>ER</td>
+                                    <td>Entidade-Relacionamento</td>
+                                </tr>
+                                <tr>
+                                    <td>MTV</td>
+                                    <td>Model-Template-View</td>
+                                </tr>
+                                <tr>
+                                    <td>ORM</td>
+                                    <td>Object-Relational Mapping</td>
+                                </tr>
+                                <tr>
+                                    <td>FK</td>
+                                    <td>Foreign Key</td>
+                                </tr>
+                                <tr>
+                                    <td>SoC</td>
+                                    <td>Separation of Concerns</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <img src="CyberGo.jpg" alt="CyberGo Logo" class="slide-logo">
+            <div class="slide-number">18</div>
+        </div>
+        
+        <!-- Slide 19: Considerações Finais -->
+        <div class="slide">
+            <div class="slide-header"></div>
+            <h2 class="slide-title"><i class="fas fa-flag-checkered"></i> Considerações Finais</h2>
+            <div class="slide-content flex-center">
+                <div class="card" style="max-width: 800px; text-align: center;">
+                    <p>Esta documentação técnica foi elaborada para auxiliar desenvolvedores e administradores de sistema a compreender a estrutura interna e o funcionamento do CyberGo.</p>
+                    
+                    <p>Alterações significativas devem ser discutidas com a equipe de desenvolvimento antes da implementação.</p>
+                    
+                    <div style="margin: 40px 0;">
+                        <h3 class="text-gradient" style="font-size: 2rem;"><i class="fas fa-award"></i> Obrigado!</h3>
+                        <p>Perguntas?</p>
+                    </div>
+                    
+                    <div style="margin-top: 40px; font-size: 0.9rem; color: #666;">
+                        <p><strong>© 2025 Desenvolvido por CyberGo. Todos os direitos reservados.</strong></p>
+                        <p>Versão da Documentação: 1.0 - Abril/2025</p>
+                    </div>
+                </div>
+            </div>
+            <img src="CyberGo.jpg" alt="CyberGo Logo" class="slide-logo">
+            <div class="slide-number">19</div>
+        </div>
+    </div>
+    
+    <div style="text-align: center; margin: 30px 0;">
+        <h2>Instruções para Transformar em PowerPoint</h2>
+        <ol style="display: inline-block; text-align: left; max-width: 600px;">
+            <li>Abra este arquivo HTML no Chrome ou Edge</li>
+            <li>Escolha a opção "Imprimir" (Ctrl+P)</li>
+            <li>Selecione "Salvar como PDF"</li>
+            <li>Abra o PowerPoint</li>
+            <li>Escolha "Inserir" > "Slides de arquivos" e selecione o PDF gerado</li>
+            <li>Os slides serão importados como apresentação</li>
+        </ol>
+    </div>
+</body>
+</html> 

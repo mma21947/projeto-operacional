@@ -1,0 +1,2116 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CyberGo - Apresentação do Sistema</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Variáveis de cores */
+        :root {
+            --primary-color: #4303f0;
+            --primary-dark: #3700cb;
+            --primary-light: #5315ff;
+            --secondary-color: #7c3aed;
+            --secondary-light: #a78bfa;
+            --accent-color: #f97316;
+            --accent-light: #fb923c;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --info-color: #06b6d4;
+            --dark-color: #1e293b;
+            --dark-light: #334155;
+            --light-color: #f8fafc;
+            --light-dark: #e2e8f0;
+            --text-dark: #0f172a;
+            --text-light: #f8fafc;
+            --text-muted: #64748b;
+            --gradient-primary: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            --gradient-accent: linear-gradient(135deg, var(--accent-color), #ec4899);
+            --gradient-cool: linear-gradient(135deg, #0ea5e9, #8b5cf6);
+            --gradient-warm: linear-gradient(135deg, #f97316, #f43f5e);
+            --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            --shadow-inner: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06);
+            --border-radius-sm: 0.25rem;
+            --border-radius-md: 0.5rem;
+            --border-radius-lg: 1rem;
+            --border-radius-full: 9999px;
+            --print-orientation: landscape;
+            --slide-padding: 2.5rem;
+            --card-spacing: 1.5rem;
+            --content-max-width: 100%;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            color: var(--text-dark);
+            background-color: #f8faff;
+            line-height: 1.6;
+            background-image: 
+                radial-gradient(circle at 20% 20%, rgba(76, 0, 255, 0.1) 0%, rgba(76, 0, 255, 0.03) 70%),
+                radial-gradient(circle at 80% 80%, rgba(94, 221, 230, 0.1) 0%, rgba(94, 221, 230, 0.03) 70%);
+            min-height: 100vh;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
+            line-height: 1.2;
+        }
+
+        /* Slides Container */
+        .slides-container {
+            max-width: 1200px;
+            margin: 2rem auto;
+        }
+
+        /* Slide principal */
+        .slide {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            margin-bottom: 3rem;
+            overflow: hidden;
+            position: relative;
+            min-height: 500px;
+            padding-bottom: 3rem;
+        }
+
+        /* Cabeçalho do slide */
+        .slide-header {
+            background: var(--gradient-primary);
+            padding: 1.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .slide-header::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23ffffff' fill-opacity='0.05' fill-rule='evenodd'/%3E%3C/svg%3E");
+            opacity: 0.3;
+        }
+
+        /* Título do slide */
+        .slide-title {
+            color: white;
+            margin: 0;
+            font-size: 2.2rem;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .slide-title i {
+            font-size: 1.8rem;
+            background: rgba(255, 255, 255, 0.2);
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: var(--border-radius-full);
+            box-shadow: var(--shadow-md);
+        }
+
+        /* Conteúdo do slide */
+        .slide-content {
+            padding: var(--slide-padding);
+            position: relative;
+            max-width: var(--content-max-width);
+        }
+
+        /* Colunas */
+        .columns {
+            display: flex;
+            gap: var(--card-spacing);
+            margin-bottom: 1.5rem;
+            break-inside: avoid;
+            page-break-inside: avoid;
+        }
+
+        .column {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: var(--card-spacing);
+        }
+
+        /* Cards - Restaurar e melhorar estilo */
+        .card {
+            background-color: var(--light-color);
+            border-radius: var(--border-radius-md);
+            padding: 1.5rem;
+            height: 100%;
+            box-shadow: var(--shadow-md);
+            border-left: 5px solid var(--primary-color);
+            position: relative;
+            overflow: hidden;
+            break-inside: avoid;
+            page-break-inside: avoid;
+        }
+        
+        .card h3 {
+            color: var(--primary-color);
+            margin-top: 0;
+            margin-bottom: 1rem;
+            font-size: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .card h3 i {
+            font-size: 1.2rem;
+            color: white;
+            background: var(--primary-color);
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: var(--border-radius-full);
+            box-shadow: var(--shadow-md);
+        }
+
+        .card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, transparent 50%, rgba(67, 3, 240, 0.1) 50%);
+            border-radius: 0 0 0 100px;
+        }
+
+        .card ul, .card ol {
+            padding-left: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .card li {
+            margin-bottom: 0.5rem;
+            position: relative;
+        }
+
+        .card li::before {
+            content: "•";
+            color: var(--primary-color);
+            font-weight: bold;
+            display: inline-block;
+            width: 1rem;
+            margin-left: -1rem;
+        }
+
+        .card p {
+            margin-bottom: 1rem;
+        }
+
+        /* Callout boxes */
+        .callout {
+            background-color: rgba(67, 3, 240, 0.1);
+            border-radius: var(--border-radius-md);
+            padding: 1.2rem;
+            margin: 1.5rem 0;
+            border-left: 4px solid var(--primary-color);
+            display: flex;
+            gap: 1rem;
+            align-items: flex-start;
+        }
+
+        .callout.tip {
+            background-color: rgba(16, 185, 129, 0.1);
+            border-left-color: var(--success-color);
+        }
+
+        .callout.warning {
+            background-color: rgba(245, 158, 11, 0.1);
+            border-left-color: var(--warning-color);
+        }
+
+        .callout.important {
+            background-color: rgba(239, 68, 68, 0.1);
+            border-left-color: var(--danger-color);
+        }
+
+        .callout i {
+            font-size: 1.2rem;
+            color: white;
+            background: var(--primary-color);
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: var(--border-radius-full);
+            flex-shrink: 0;
+        }
+
+        .callout.tip i {
+            background: var(--success-color);
+        }
+
+        .callout.warning i {
+            background: var(--warning-color);
+        }
+
+        .callout.important i {
+            background: var(--danger-color);
+        }
+
+        .callout-content p:last-child {
+            margin-bottom: 0;
+        }
+
+        /* Hero slide */
+        .hero-slide {
+            text-align: center;
+            min-height: auto;
+            padding-bottom: 2rem;
+        }
+
+        .hero-slide .slide-header {
+            background: var(--gradient-cool);
+            padding: 2.5rem 1.5rem;
+        }
+
+        .hero-content {
+            padding: 2.5rem;
+        }
+
+        .logo-container {
+            margin: 2rem auto;
+            max-width: 250px;
+        }
+
+        .logo-container img {
+            width: 100%;
+            height: auto;
+            filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1));
+        }
+
+        .hero-title {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-align: center;
+        }
+
+        .hero-subtitle {
+            font-size: 1.5rem;
+            color: var(--text-muted);
+            margin-bottom: 2rem;
+            font-weight: 500;
+        }
+
+        .hero-badges {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin: 2rem 0;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            background: var(--light-color);
+            padding: 0.5rem 1rem;
+            border-radius: var(--border-radius-full);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: var(--shadow-sm);
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        .badge i {
+            color: var(--primary-color);
+        }
+
+        /* Feature grid */
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin: 2.5rem 0;
+        }
+
+        @media (max-width: 992px) {
+            .feature-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 576px) {
+            .feature-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .feature-item {
+            background: white;
+            border-radius: var(--border-radius-md);
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: var(--shadow-md);
+            transition: transform 0.3s ease;
+            position: relative;
+            z-index: 1;
+            overflow: hidden;
+        }
+
+        .feature-item::before {
+            content: "";
+            position: absolute;
+            width: 150%;
+            height: 150%;
+            background: var(--gradient-primary);
+            opacity: 0;
+            z-index: -1;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            border-radius: 50%;
+            transition: transform 0.5s ease, opacity 0.5s ease;
+        }
+
+        .feature-item:hover {
+            transform: translateY(-5px);
+            color: white;
+        }
+
+        .feature-item:hover::before {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        .feature-item:hover h3, .feature-item:hover p {
+            color: white;
+            position: relative;
+        }
+
+        .feature-icon {
+            font-size: 2rem;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+            transition: color 0.3s ease;
+        }
+
+        .feature-item:hover .feature-icon {
+            color: white;
+        }
+
+        .feature-title {
+            font-size: 1.2rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-dark);
+            transition: color 0.3s ease;
+        }
+
+        /* Status flow */
+        .status-flow {
+            margin: 2rem 0;
+            display: flex;
+            justify-content: space-between;
+            position: relative;
+            flex-wrap: wrap;
+        }
+
+        .status-flow::before {
+            content: "";
+            position: absolute;
+            top: 40px;
+            left: 60px;
+            right: 60px;
+            height: 4px;
+            background: #e2e8f0;
+            z-index: 1;
+        }
+
+        .status-step {
+            flex: 1;
+            min-width: 120px;
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            padding: 0 10px;
+            margin-bottom: 1.5rem;
+        }
+
+        .status-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            border: 3px solid #e2e8f0;
+            position: relative;
+            box-shadow: var(--shadow-md);
+            transition: all 0.3s ease;
+        }
+
+        .status-icon i {
+            font-size: 2rem;
+            color: #cbd5e1;
+            transition: all 0.3s ease;
+        }
+
+        .status-icon.active {
+            border-color: var(--primary-color);
+            background: var(--primary-light);
+        }
+
+        .status-icon.active i {
+            color: white;
+        }
+
+        .status-label {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+            color: #64748b;
+        }
+
+        .status-icon.active + .status-label {
+            color: var(--primary-color);
+        }
+
+        .status-description {
+            font-size: 0.875rem;
+            color: #94a3b8;
+        }
+
+        /* Slide logo */
+        .slide-logo {
+            position: absolute;
+            bottom: 1rem;
+            right: 1rem;
+            width: 100px;
+            opacity: 0.3;
+        }
+
+        /* Slide number */
+        .slide-number {
+            position: absolute;
+            bottom: 1rem;
+            left: 1.5rem;
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        /* Image container */
+        .image-container {
+            margin: 1.5rem 0;
+            border-radius: var(--border-radius-md);
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+        }
+
+        .image-container img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        /* Animation on hover */
+        .card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        /* Código adaptado para impressão em PDF */
+        @media print {
+            body {
+                background: white;
+                font-size: 12pt;
+                margin: 0;
+                padding: 0;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+
+            .slides-container {
+                margin: 0;
+                max-width: 100%;
+                width: 100%;
+                padding: 0;
+            }
+
+            .slide {
+                box-shadow: none;
+                margin-bottom: 0;
+                page-break-after: always;
+                page-break-inside: avoid;
+                min-height: auto;
+                height: auto;
+                border-radius: 0;
+                border: 1px solid #ddd;
+                width: 100%;
+                padding-bottom: 1.5rem;
+                display: block;
+            }
+
+            .slide-content {
+                padding: 1.5rem;
+                overflow: visible;
+            }
+
+            .card, .callout {
+                box-shadow: none;
+                border: 1px solid #ddd;
+                page-break-inside: avoid;
+                margin-bottom: 1rem;
+            }
+
+            .columns {
+                page-break-inside: avoid;
+                display: flex;
+                flex-wrap: wrap;
+                gap: 1rem;
+            }
+            
+            .column {
+                flex: 1 1 48%;
+                min-width: 48%;
+            }
+
+            .feature-grid {
+                page-break-inside: avoid;
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 1rem;
+            }
+
+            .status-flow {
+                page-break-inside: avoid;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .status-step {
+                min-width: 100px;
+                margin: 0 0.5rem 1rem;
+            }
+
+            .card:hover {
+                transform: none;
+                box-shadow: none;
+            }
+
+            .feature-item:hover {
+                transform: none;
+                color: inherit;
+            }
+
+            .feature-item:hover::before {
+                opacity: 0;
+            }
+
+            .feature-item:hover h3, 
+            .feature-item:hover p,
+            .feature-item:hover .feature-icon {
+                color: inherit;
+            }
+
+            /* Ajustes específicos para paginação */
+            h2, h3 {
+                page-break-after: avoid;
+            }
+            
+            p, li {
+                page-break-inside: avoid;
+            }
+            
+            img {
+                page-break-inside: avoid;
+            }
+            
+            /* Garante que o número da página e o logo estejam visíveis */
+            .slide-number, .slide-logo {
+                position: absolute;
+                bottom: 0.5rem;
+            }
+            
+            /* Garantir que o slide 8 (Suporte e Ajuda) seja legível e não corte conteúdo */
+            #slide-8 .columns {
+                display: flex;
+                flex-direction: row;
+                flex-wrap: nowrap;
+                gap: 1cm;
+            }
+            
+            #slide-8 .column {
+                flex: 1;
+                min-width: 0;
+            }
+            
+            #slide-8 .card h3 i {
+                width: 24px;
+                height: 24px;
+                font-size: 10pt;
+                flex-shrink: 0;
+            }
+            
+            /* Ajustar espaçamento para o slide de canais de atendimento */
+            #slide-8 ul li, #slide-8 ol li {
+                margin-bottom: 0.15rem;
+            }
+            
+            /* Garantir que todo conteúdo seja visível */
+            body {
+                font-size: 9pt;
+            }
+            
+            /* Reduzir padding para caber mais conteúdo */
+            .card {
+                padding: 1.2rem;
+            }
+            
+            /* Usar o espaço horizontal mais eficientemente */
+            ul, ol {
+                padding-left: 1.2rem;
+            }
+            
+            /* Certifique-se de que cada slide se encaixa em uma página */
+            @page {
+                margin: 0.4cm;
+            }
+        }
+        
+        /* Ajustes adicionais para impressão */
+        @page {
+            margin: 0.5cm;
+            size: A4 landscape;
+        }
+
+        @media print {
+            body {
+                background: white;
+                font-size: 12pt;
+                margin: 0;
+                padding: 0;
+            }
+
+            /* Estilos para cabeçalho e rodapé de impressão */
+            .slide::after {
+                content: "Apresentação CyberGo - " attr(data-title);
+                position: absolute;
+                top: 0.3cm;
+                right: 0.5cm;
+                font-size: 8pt;
+                color: #777;
+            }
+
+            .callout {
+                background-color: #f8f9fa !important;
+                print-color-adjust: exact;
+                -webkit-print-color-adjust: exact;
+            }
+
+            .alert {
+                background-color: rgba(255, 234, 230, 0.5) !important;
+                border: 1px solid #ff5c33 !important;
+                print-color-adjust: exact;
+                -webkit-print-color-adjust: exact;
+            }
+
+            /* Ajustes específicos por slide */
+            #slide-1 {
+                page-break-after: always;
+            }
+        }
+
+        /* Botões de ação */
+        .action-buttons {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            z-index: 1000;
+        }
+
+        .action-btn {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            font-size: 1.25rem;
+            cursor: pointer;
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .action-btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .action-btn.secondary {
+            background: var(--secondary-color);
+        }
+
+        .print-instructions {
+            display: none;
+            background: white;
+            border-radius: var(--border-radius-md);
+            box-shadow: var(--shadow-lg);
+            padding: 1.5rem;
+            position: fixed;
+            bottom: 6rem;
+            right: 2rem;
+            width: 300px;
+            z-index: 999;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .print-instructions h3 {
+            margin-top: 0;
+            color: var(--primary-color);
+        }
+
+        .print-instructions ol {
+            padding-left: 1.5rem;
+            margin-bottom: 0;
+        }
+
+        @media print {
+            .action-buttons, .print-instructions {
+                display: none !important;
+            }
+        }
+
+        /* Layout para modo paisagem */
+        @media (orientation: landscape), print {
+            .feature-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 1.5rem;
+            }
+            
+            .columns {
+                display: flex;
+                gap: 2rem;
+            }
+            
+            .column {
+                flex: 1;
+            }
+            
+            .status-flow {
+                justify-content: space-around;
+            }
+            
+            .status-step {
+                min-width: 150px;
+            }
+            
+            /* Ajustes específicos para slides em paisagem */
+            .slide-content {
+                max-width: 100%;
+                padding: 2rem 3rem;
+            }
+            
+            /* Otimiza o layout do slide de boas-vindas */
+            .hero-content .feature-grid {
+                grid-template-columns: repeat(6, 1fr);
+                gap: 1rem;
+            }
+            
+            /* Ajuste para o grid de charts */
+            .columns.chart-columns {
+                display: flex;
+                flex-wrap: wrap;
+            }
+            
+            .columns.chart-columns .column {
+                flex: 1 1 22%;
+                min-width: 22%;
+            }
+        }
+        
+        @media print {
+            /* Layout otimizado para impressão em paisagem */
+            .feature-grid {
+                grid-template-columns: repeat(3, 1fr) !important;
+                break-inside: avoid;
+            }
+            
+            .hero-content .feature-grid {
+                grid-template-columns: repeat(3, 1fr) !important;
+            }
+            
+            .columns {
+                break-inside: avoid;
+                display: flex !important;
+                flex-wrap: nowrap !important;
+            }
+            
+            .column {
+                flex: 1 !important;
+                min-width: 0 !important; /* Permite que as colunas encolham */
+            }
+        }
+        
+        /* Classe para forçar modo paisagem */
+        body.force-landscape {
+            width: 100%;
+            min-height: auto;
+        }
+        
+        @media print {
+            body.force-landscape {
+                width: 100vw;
+                height: auto !important;
+                transform-origin: top left;
+                overflow-x: hidden;
+            }
+            
+            /* Remoção de elementos desnecessários na impressão */
+            @page {
+                size: A4 landscape;
+            }
+        }
+
+        /* Melhoria específica para cartões de atendimento */
+        .card ul li {
+            line-height: 1.5;
+            margin-bottom: 0.5rem;
+            page-break-inside: avoid;
+        }
+        
+        /* Espaçamento consistente para elementos de conteúdo */
+        p, ul, ol {
+            margin-bottom: 1rem;
+        }
+        
+        p:last-child, ul:last-child, ol:last-child {
+            margin-bottom: 0;
+        }
+        
+        /* Ajustes adicionais para impressão */
+        @media print {
+            /* Cartões de atendimento e informações */
+            #slide-8 .card {
+                font-size: 9pt;
+                padding: 1rem;
+            }
+            
+            #slide-8 .card h3 {
+                font-size: 11pt;
+                margin-bottom: 0.5rem;
+            }
+            
+            #slide-8 .card ul li, 
+            #slide-8 .card ol li {
+                margin-bottom: 0.25rem;
+            }
+            
+            /* Ajuste para os horários de atendimento */
+            #slide-8 .card p[style*="margin-top"] {
+                margin-top: 0.5rem !important;
+            }
+            
+            /* Evitar que o conteúdo seja cortado */
+            .slide {
+                min-height: unset;
+                height: auto;
+                padding-bottom: 2rem;
+            }
+            
+            /* Aumentar área útil */
+            .slide-content {
+                padding: 1cm;
+            }
+            
+            /* Reduzir tamanho do texto nas listas */
+            ul li, ol li {
+                font-size: 9pt;
+                line-height: 1.3;
+            }
+            
+            /* Ajuste para tamanho de texto */
+            p {
+                font-size: 9pt;
+                line-height: 1.4;
+            }
+        }
+
+        /* Garantir que todos os elementos sejam visíveis em qualquer zoom */
+        @media print and (max-width: 1200px) {
+            body {
+                font-size: 8pt;
+            }
+            
+            h1 {
+                font-size: 18pt;
+            }
+            
+            h2 {
+                font-size: 14pt;
+            }
+            
+            h3 {
+                font-size: 11pt;
+            }
+            
+            .card {
+                padding: 0.8rem;
+            }
+            
+            .card h3 {
+                margin-bottom: 0.5rem;
+                font-size: 10pt;
+            }
+            
+            .card h3 i {
+                width: 20px;
+                height: 20px;
+                font-size: 9pt;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="slides-container">
+        <!-- Slide 1: Boas-vindas -->
+        <div class="slide" id="slide-1" data-title="Bem-vindo">
+            <div class="slide-header">
+                <h1 class="slide-title"><i class="fas fa-rocket"></i> CyberGo</h1>
+            </div>
+            <div class="hero-content">
+                <div class="logo-container">
+                    <img src="CyberGo.jpg" alt="CyberGo Logo">
+                </div>
+                <h1 class="hero-title">Sistema CyberGo</h1>
+                <h2 class="hero-subtitle">Plataforma Avançada de Gestão de Contratos e Pedidos</h2>
+                
+                <div class="hero-badges">
+                    <div class="badge"><i class="fas fa-check-circle"></i> Fácil de usar</div>
+                    <div class="badge"><i class="fas fa-bolt"></i> Eficiente</div>
+                    <div class="badge"><i class="fas fa-shield-alt"></i> Seguro</div>
+                    <div class="badge"><i class="fas fa-sync-alt"></i> Integrado</div>
+                    <div class="badge"><i class="fas fa-chart-line"></i> Análise em tempo real</div>
+                </div>
+                
+                <div class="feature-grid">
+                    <div class="feature-item">
+                        <i class="fas fa-shopping-cart feature-icon"></i>
+                        <h3 class="feature-title">Gestão de Pedidos</h3>
+                        <p>Controle completo do fluxo de pedidos, desde a criação até a entrega.</p>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-box feature-icon"></i>
+                        <h3 class="feature-title">Catálogo de Produtos</h3>
+                        <p>Acesse um catálogo completo com todos os produtos disponíveis.</p>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-school feature-icon"></i>
+                        <h3 class="feature-title">Gestão de Contratos</h3>
+                        <p>Administre facilmente todas os contratos cadastrados.</p>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-chart-pie feature-icon"></i>
+                        <h3 class="feature-title">Relatórios Avançados</h3>
+                        <p>Visualize dados e métricas importantes para tomada de decisões.</p>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-user-shield feature-icon"></i>
+                        <h3 class="feature-title">Gestão de Usuários</h3>
+                        <p>Controle de acesso e permissões para diferentes perfis de usuários.</p>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-search-dollar feature-icon"></i>
+                        <h3 class="feature-title">Controle Orçamentário</h3>
+                        <p>Acompanhe em tempo real o orçamento disponível para cada contrato.</p>
+                    </div>
+                </div>
+                
+                <div class="callout">
+                    <i class="fas fa-info-circle"></i>
+                    <div class="callout-content">
+                        <p>Este manual contém todas as informações necessárias para utilizar o sistema CyberGo de forma eficiente. Caso precise de suporte adicional, entre em contato com nossa equipe.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="slide-number">01</div>
+        </div>
+
+        <!-- Slide 2: Visão Geral do Sistema -->
+        <div class="slide" id="slide-2" data-title="Visão Geral">
+            <div class="slide-header">
+                <h2 class="slide-title"><i class="fas fa-sitemap"></i> Visão Geral do Sistema</h2>
+            </div>
+            <div class="slide-content">
+                <div class="card">
+                    <h3><i class="fas fa-compass"></i> Navegação Principal</h3>
+                    <p>O sistema CyberGo oferece uma interface intuitiva com os seguintes módulos principais:</p>
+                    
+                    <div class="columns">
+                        <div class="column">
+                            <ul>
+                                <li><span style="font-weight: 600;">Dashboard</span> - Visão geral com indicadores e estatísticas</li>
+                                <li><span style="font-weight: 600;">Pedidos</span> - Gerenciamento completo do fluxo de pedidos</li>
+                                <li><span style="font-weight: 600;">Produtos</span> - Catálogo de produtos disponíveis para pedidos</li>
+                                <li><span style="font-weight: 600;">Contratos</span> - Gestão dos contratos</li>
+                            </ul>
+                        </div>
+                        <div class="column">
+                            <ul>
+                                <li><span style="font-weight: 600;">Relatórios</span> - Análises e métricas avançadas</li>
+                                <li><span style="font-weight: 600;">Usuários</span> - Controle de acesso e permissões</li>
+                                <li><span style="font-weight: 600;">Configurações</span> - Personalizações do sistema</li>
+                                <li><span style="font-weight: 600;">Ajuda</span> - Suporte e documentação</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h3><i class="fas fa-user-tag"></i> Perfis de Usuário</h3>
+                    <p>O sistema conta com diferentes perfis de acesso, cada um com funcionalidades específicas:</p>
+                    
+                    <div class="columns">
+                        <div class="column">
+                            <ul>
+                                <li><span style="font-weight: 600;">Administrador</span> - Acesso completo a todas as funcionalidades</li>
+                                <li><span style="font-weight: 600;">Gestor</span> - Gerenciamento de pedidos e relatórios</li>
+                                <li><span style="font-weight: 600;">Operacional</span> - Processamento e atualização de pedidos</li>
+                            </ul>
+                        </div>
+                        <div class="column">
+                            <ul>
+                                <li><span style="font-weight: 600;">Contratos</span> - Criação e acompanhamento de pedidos</li>
+                                <li><span style="font-weight: 600;">Visualizador</span> - Acesso limitado a relatórios e consultas</li>
+                                <li><span style="font-weight: 600;">Suporte</span> - Acesso para atendimento ao usuário</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="callout tip">
+                        <i class="fas fa-lightbulb"></i>
+                        <div class="callout-content">
+                            <p>Cada perfil tem acesso a menus e funcionalidades específicas. O sistema adequa automaticamente a interface com base no seu perfil de acesso.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="callout">
+                    <i class="fas fa-info-circle"></i>
+                    <div class="callout-content">
+                        <p>O CyberGo é um sistema responsivo - você pode acessá-lo de qualquer dispositivo, incluindo computadores, tablets e smartphones, com a mesma experiência de uso.</p>
+                    </div>
+                </div>
+            </div>
+            <img src="CyberGo.jpg" alt="CyberGo Logo" class="slide-logo">
+            <div class="slide-number">02</div>
+        </div>
+        
+        <!-- Slide 3: Gestão de Pedidos -->
+        <div class="slide" id="slide-3" data-title="Gestão de Pedidos">
+            <div class="slide-header">
+                <h2 class="slide-title"><i class="fas fa-shopping-cart"></i> Gestão de Pedidos</h2>
+            </div>
+            <div class="slide-content">
+                <div class="columns">
+                    <div class="column">
+                        <div class="card">
+                            <h3><i class="fas fa-plus-circle"></i> Criando um Novo Pedido</h3>
+                            <p>Para criar um novo pedido, siga os passos:</p>
+                            <ol>
+                                <li><span style="font-weight: 600;">Acesse a seção "Pedidos" no menu principal</span></li>
+                                <li><span style="font-weight: 600;">Clique no botão "Novo Pedido"</span></li>
+                                <li><span style="font-weight: 600;">Selecione o contrato</span></li>
+                                <li><span style="font-weight: 600;">Adicione produtos ao carrinho</span></li>
+                                <li><span style="font-weight: 600;">Revise os itens e quantidades</span></li>
+                                <li><span style="font-weight: 600;">Preencha observações se necessário</span></li>
+                                <li><span style="font-weight: 600;">Clique em "Salvar Rascunho" ou "Enviar Pedido"</span></li>
+                            </ol>
+                            
+                            <div class="callout tip">
+                                <i class="fas fa-lightbulb"></i>
+                                <div class="callout-content">
+                                    <p>Um pedido salvo como rascunho pode ser editado posteriormente. Somente ao clicar em "Enviar Pedido" ele entra na fila de processamento.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="column">
+                        <div class="card">
+                            <h3><i class="fas fa-search"></i> Consultando Pedidos</h3>
+                            <p>Você pode visualizar todos os seus pedidos e acompanhar seu status:</p>
+                            <ul>
+                                <li><span style="font-weight: 600;">Acesse "Pedidos > Lista de Pedidos"</span></li>
+                                <li><span style="font-weight: 600;">Utilize os filtros para encontrar pedidos específicos</span></li>
+                                <li><span style="font-weight: 600;">Clique em um pedido para ver seus detalhes</span></li>
+                                <li><span style="font-weight: 600;">Acompanhe o histórico de status e observações</span></li>
+                                <li><span style="font-weight: 600;">Exporte para PDF ou imprima se necessário</span></li>
+                            </ul>
+                            
+                            <div class="callout warning">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                <div class="callout-content">
+                                    <p>Pedidos já enviados não podem ser editados. Caso precise alterar algo, entre em contato com o suporte.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <h3 style="margin-top: 2rem; margin-bottom: 1rem;">Fluxo de Status de Pedidos</h3>
+                <p>Cada pedido passa por diferentes status durante seu ciclo de vida:</p>
+                
+                <div class="status-flow">
+                    <div class="status-step">
+                        <div class="status-icon active">
+                            <i class="fas fa-file-alt"></i>
+                        </div>
+                        <div class="status-label">Rascunho</div>
+                        <div class="status-description">Pedido em elaboração</div>
+                    </div>
+                    
+                    <div class="status-step">
+                        <div class="status-icon active">
+                            <i class="fas fa-paper-plane"></i>
+                        </div>
+                        <div class="status-label">Enviado</div>
+                        <div class="status-description">Aguardando análise</div>
+                    </div>
+                    
+                    <div class="status-step">
+                        <div class="status-icon active">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="status-label">Aprovado</div>
+                        <div class="status-description">Pronto para produção</div>
+                    </div>
+                    
+                    <div class="status-step">
+                        <div class="status-icon">
+                            <i class="fas fa-box"></i>
+                        </div>
+                        <div class="status-label">Em Produção</div>
+                        <div class="status-description">Pedido sendo preparado</div>
+                    </div>
+                    
+                    <div class="status-step">
+                        <div class="status-icon">
+                            <i class="fas fa-truck"></i>
+                        </div>
+                        <div class="status-label">Em Entrega</div>
+                        <div class="status-description">A caminho</div>
+                    </div>
+                    
+                    <div class="status-step">
+                        <div class="status-icon">
+                            <i class="fas fa-check-double"></i>
+                        </div>
+                        <div class="status-label">Entregue</div>
+                        <div class="status-description">Pedido finalizado</div>
+                    </div>
+                </div>
+                
+                <div class="callout important">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <div class="callout-content">
+                        <p>O sistema verifica automaticamente se o pedido está dentro do orçamento disponível para o contrato. Caso exceda o limite, você será notificado antes de enviar.</p>
+                    </div>
+                </div>
+            </div>
+            <img src="CyberGo.jpg" alt="CyberGo Logo" class="slide-logo">
+            <div class="slide-number">03</div>
+        </div>
+
+        <!-- Slide 4: Catálogo de Produtos -->
+        <div class="slide" id="slide-4" data-title="Catálogo de Produtos">
+            <div class="slide-header">
+                <h2 class="slide-title"><i class="fas fa-box"></i> Catálogo de Produtos</h2>
+            </div>
+            <div class="slide-content">
+                <div class="columns">
+                    <div class="column">
+                        <div class="card">
+                            <h3><i class="fas fa-search"></i> Pesquisando Produtos</h3>
+                            <p>O sistema oferece diversas formas de encontrar os produtos que você precisa:</p>
+                            <ul>
+                                <li><span style="font-weight: 600;">Busca por nome ou código</span> - Digite termos na barra de pesquisa</li>
+                                <li><span style="font-weight: 600;">Filtros avançados</span> - Filtre por categoria, tipo, preço, etc.</li>
+                                <li><span style="font-weight: 600;">Navegação por categorias</span> - Explore produtos organizados em categorias</li>
+                                <li><span style="font-weight: 600;">Favoritos</span> - Acesse rapidamente produtos marcados como favoritos</li>
+                                <li><span style="font-weight: 600;">Histórico</span> - Visualize produtos frequentemente pedidos</li>
+                            </ul>
+                            
+                            <div class="callout tip">
+                                <i class="fas fa-lightbulb"></i>
+                                <div class="callout-content">
+                                    <p>Use a função de "Adicionar aos Favoritos" (ícone de estrela) para marcar produtos frequentemente solicitados e acessá-los rapidamente em futuros pedidos.</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card">
+                            <h3><i class="fas fa-info-circle"></i> Detalhes do Produto</h3>
+                            <p>Ao clicar em um produto, você terá acesso a informações detalhadas:</p>
+                            <ul>
+                                <li><span style="font-weight: 600;">Descrição completa</span> - Especificações técnicas do produto</li>
+                                <li><span style="font-weight: 600;">Imagens</span> - Fotos de alta qualidade do produto</li>
+                                <li><span style="font-weight: 600;">Preço unitário</span> - Valor atualizado conforme contrato</li>
+                                <li><span style="font-weight: 600;">Disponibilidade</span> - Status atual de estoque</li>
+                                <li><span style="font-weight: 600;">Histórico de preços</span> - Evolução do valor ao longo do tempo</li>
+                                <li><span style="font-weight: 600;">Produtos relacionados</span> - Itens compatíveis ou complementares</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="column">
+                        <div class="card">
+                            <h3><i class="fas fa-tag"></i> Categorias de Produtos</h3>
+                            <p>Os produtos estão organizados nas seguintes categorias principais:</p>
+                            <ul>
+                                <li><span style="font-weight: 600;">Material Didático</span> - Livros, apostilas, cadernos</li>
+                                <li><span style="font-weight: 600;">Material Escolar</span> - Lápis, canetas, cadernos, etc.</li>
+                                <li><span style="font-weight: 600;">Tecnologia</span> - Computadores, tablets, projetores</li>
+                                <li><span style="font-weight: 600;">Mobiliário</span> - Mesas, cadeiras, armários</li>
+                                <li><span style="font-weight: 600;">Equipamentos Esportivos</span> - Bolas, redes, colchonetes</li>
+                                <li><span style="font-weight: 600;">Material de Laboratório</span> - Equipamentos científicos</li>
+                                <li><span style="font-weight: 600;">Material de Limpeza</span> - Produtos de higienização</li>
+                                <li><span style="font-weight: 600;">Alimentação</span> - Itens para merenda escolar</li>
+                                <li><span style="font-weight: 600;">Uniformes</span> - Roupas e calçados escolares</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="card">
+                            <h3><i class="fas fa-shopping-basket"></i> Adicionando ao Pedido</h3>
+                            <p>Para adicionar produtos ao seu pedido:</p>
+                            <ol>
+                                <li><span style="font-weight: 600;">Informe a quantidade desejada</span> - Use os controles + e -</li>
+                                <li><span style="font-weight: 600;">Clique em "Adicionar ao Carrinho"</span> - O produto será incluído</li>
+                                <li><span style="font-weight: 600;">Verifique o subtotal</span> - Acompanhe o valor total do pedido</li>
+                                <li><span style="font-weight: 600;">Adicione observações se necessário</span> - Para instruções específicas</li>
+                            </ol>
+                            
+                            <div class="callout warning">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                <div class="callout-content">
+                                    <p>Fique atento às unidades de medida de cada produto (unidade, caixa, pacote, etc.) para evitar erros na quantidade solicitada.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="callout">
+                    <i class="fas fa-sync-alt"></i>
+                    <div class="callout-content">
+                        <p>O catálogo de produtos é atualizado regularmente. Os preços exibidos estão de acordo com o contrato vigente e são atualizados automaticamente.</p>
+                    </div>
+                </div>
+            </div>
+            <img src="CyberGo.jpg" alt="CyberGo Logo" class="slide-logo">
+            <div class="slide-number">04</div>
+        </div>
+        
+        <!-- Slide 5: Gestão de Escolas -->
+        <div class="slide" id="slide-5" data-title="Gestão de Escolas">
+            <div class="slide-header">
+                <h2 class="slide-title"><i class="fas fa-school"></i> Gestão de Escolas</h2>
+            </div>
+            <div class="slide-content">
+                <div class="columns">
+                    <div class="column">
+                        <div class="card">
+                            <h3><i class="fas fa-building"></i> Perfil da Escola</h3>
+                            <p>Cada unidade escolar possui um perfil completo com informações importantes:</p>
+                            <ul>
+                                <li><span style="font-weight: 600;">Dados cadastrais</span> - Nome, código, endereço, telefone</li>
+                                <li><span style="font-weight: 600;">Responsáveis</span> - Diretor, coordenador, secretário</li>
+                                <li><span style="font-weight: 600;">Informações complementares</span> - Número de alunos, turnos</li>
+                                <li><span style="font-weight: 600;">Contrato associado</span> - Detalhes do contrato vigente</li>
+                                <li><span style="font-weight: 600;">Orçamento</span> - Valor disponível para pedidos</li>
+                                <li><span style="font-weight: 600;">Histórico</span> - Registro de pedidos anteriores</li>
+                            </ul>
+                            
+                            <div class="callout tip">
+                                <i class="fas fa-lightbulb"></i>
+                                <div class="callout-content">
+                                    <p>Mantenha os dados da sua escola sempre atualizados. Informações precisas garantem entregas corretas e comunicação eficiente.</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card">
+                            <h3><i class="fas fa-chart-line"></i> Dashboard da Escola</h3>
+                            <p>Cada unidade possui um painel personalizado com métricas importantes:</p>
+                            <ul>
+                                <li><span style="font-weight: 600;">Orçamento utilizado x disponível</span> - Gráfico de consumo</li>
+                                <li><span style="font-weight: 600;">Pedidos recentes</span> - Status dos últimos pedidos</li>
+                                <li><span style="font-weight: 600;">Itens mais solicitados</span> - Produtos frequentes</li>
+                                <li><span style="font-weight: 600;">Alertas</span> - Notificações sobre orçamento e pedidos</li>
+                                <li><span style="font-weight: 600;">Calendário</span> - Prazos e datas importantes</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="column">
+                        <div class="card">
+                            <h3><i class="fas fa-money-bill-wave"></i> Gestão de Orçamento</h3>
+                            <p>O sistema permite acompanhar e gerenciar o orçamento disponível:</p>
+                            <ul>
+                                <li><span style="font-weight: 600;">Visualização do saldo</span> - Valor total disponível</li>
+                                <li><span style="font-weight: 600;">Consumo por período</span> - Análise mensal/trimestral</li>
+                                <li><span style="font-weight: 600;">Consumo por categoria</span> - Divisão por tipo de produto</li>
+                                <li><span style="font-weight: 600;">Previsão de gastos</span> - Estimativas para o período</li>
+                                <li><span style="font-weight: 600;">Histórico de utilização</span> - Registro de consumo anterior</li>
+                            </ul>
+                            
+                            <div class="callout important">
+                                <i class="fas fa-exclamation-circle"></i>
+                                <div class="callout-content">
+                                    <p>O sistema não permite a criação de pedidos que excedam o orçamento disponível. Acompanhe regularmente seu saldo para planejar suas solicitações.</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card">
+                            <h3><i class="fas fa-file-alt"></i> Relatórios da Escola</h3>
+                            <p>Diversos relatórios estão disponíveis para auxiliar na gestão:</p>
+                            <ul>
+                                <li><span style="font-weight: 600;">Histórico de pedidos</span> - Todos os pedidos realizados</li>
+                                <li><span style="font-weight: 600;">Consumo por período</span> - Análise de gastos por data</li>
+                                <li><span style="font-weight: 600;">Produtos mais solicitados</span> - Ranking de itens</li>
+                                <li><span style="font-weight: 600;">Tempo médio de entrega</span> - Performance logística</li>
+                                <li><span style="font-weight: 600;">Comparativo entre períodos</span> - Evolução dos gastos</li>
+                            </ul>
+                            
+                            <div class="callout tip">
+                                <i class="fas fa-lightbulb"></i>
+                                <div class="callout-content">
+                                    <p>Todos os relatórios podem ser exportados em PDF, Excel ou impressos diretamente pelo sistema.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="callout">
+                    <i class="fas fa-info-circle"></i>
+                    <div class="callout-content">
+                        <p>O módulo de Gestão de Escolas foi desenvolvido para proporcionar transparência e facilitar o acompanhamento dos recursos disponíveis para cada unidade escolar.</p>
+                    </div>
+                </div>
+            </div>
+            <img src="CyberGo.jpg" alt="CyberGo Logo" class="slide-logo">
+            <div class="slide-number">05</div>
+        </div>
+        
+        <!-- Slide 6: Relatórios Avançados -->
+        <div class="slide" id="slide-6" data-title="Relatórios Avançados">
+            <div class="slide-header">
+                <h2 class="slide-title"><i class="fas fa-chart-pie"></i> Relatórios Avançados</h2>
+            </div>
+            <div class="slide-content">
+                <div class="columns">
+                    <div class="column">
+                        <div class="card">
+                            <h3><i class="fas fa-file-alt"></i> Tipos de Relatórios</h3>
+                            <p>O sistema oferece diversos relatórios para análise e tomada de decisões:</p>
+                            <ul>
+                                <li><span style="font-weight: 600;">Relatórios Operacionais</span> - Status atual dos pedidos</li>
+                                <li><span style="font-weight: 600;">Relatórios Gerenciais</span> - Métricas para gestores</li>
+                                <li><span style="font-weight: 600;">Relatórios Financeiros</span> - Análise de custos e orçamentos</li>
+                                <li><span style="font-weight: 600;">Relatórios de Performance</span> - Indicadores de desempenho</li>
+                                <li><span style="font-weight: 600;">Relatórios de Estoque</span> - Controle de produtos</li>
+                                <li><span style="font-weight: 600;">Relatórios Personalizados</span> - Criados conforme necessidade</li>
+                            </ul>
+                            
+                            <div class="callout tip">
+                                <i class="fas fa-lightbulb"></i>
+                                <div class="callout-content">
+                                    <p>Use a função "Salvar Filtros" para criar relatórios personalizados que você acessa frequentemente, economizando tempo.</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card">
+                            <h3><i class="fas fa-search-dollar"></i> Análise Orçamentária</h3>
+                            <p>Monitore e analise a utilização dos recursos financeiros:</p>
+                            <ul>
+                                <li><span style="font-weight: 600;">Comparativo Orçado x Realizado</span> - Análise de desvios</li>
+                                <li><span style="font-weight: 600;">Evolução de Gastos</span> - Histórico de consumo</li>
+                                <li><span style="font-weight: 600;">Projeções e Tendências</span> - Estimativas para o período</li>
+                                <li><span style="font-weight: 600;">Análise por Categoria</span> - Divisão dos gastos</li>
+                                <li><span style="font-weight: 600;">Alertas de Consumo</span> - Notificações de limites</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="column">
+                        <div class="card">
+                            <h3><i class="fas fa-filter"></i> Filtros e Parâmetros</h3>
+                            <p>Personalize seus relatórios com diversos filtros disponíveis:</p>
+                            <ul>
+                                <li><span style="font-weight: 600;">Período</span> - Selecione datas específicas</li>
+                                <li><span style="font-weight: 600;">Unidade Escolar</span> - Filtre por escola</li>
+                                <li><span style="font-weight: 600;">Categoria de Produto</span> - Agrupe por tipo</li>
+                                <li><span style="font-weight: 600;">Status de Pedido</span> - Acompanhe por situação</li>
+                                <li><span style="font-weight: 600;">Usuário</span> - Filtre por solicitante</li>
+                                <li><span style="font-weight: 600;">Contrato</span> - Selecione contratos específicos</li>
+                                <li><span style="font-weight: 600;">Valor</span> - Defina faixas de preço</li>
+                            </ul>
+                            
+                            <div class="callout">
+                                <i class="fas fa-info-circle"></i>
+                                <div class="callout-content">
+                                    <p>Quanto mais específicos forem os filtros, mais precisos serão os resultados. Combine múltiplos filtros para análises detalhadas.</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card">
+                            <h3><i class="fas fa-file-export"></i> Exportação e Compartilhamento</h3>
+                            <p>Todos os relatórios podem ser exportados em diversos formatos:</p>
+                            <ul>
+                                <li><span style="font-weight: 600;">PDF</span> - Para visualização e impressão</li>
+                                <li><span style="font-weight: 600;">Excel</span> - Para análises adicionais</li>
+                                <li><span style="font-weight: 600;">CSV</span> - Para integração com outros sistemas</li>
+                                <li><span style="font-weight: 600;">Imagem</span> - Para inclusão em apresentações</li>
+                            </ul>
+                            
+                            <p style="margin-top: 1rem;">Opções de compartilhamento:</p>
+                            <ul>
+                                <li><span style="font-weight: 600;">E-mail</span> - Envie diretamente para destinatários</li>
+                                <li><span style="font-weight: 600;">Agendamento</span> - Programe envios automáticos</li>
+                                <li><span style="font-weight: 600;">Link</span> - Compartilhe acesso online</li>
+                                <li><span style="font-weight: 600;">Impressão</span> - Gere cópias físicas</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 1.5rem;">
+                    <h3 style="margin-bottom: 1rem;">Visualização de Dados</h3>
+                    <p>O sistema oferece diversos formatos de visualização para facilitar a análise:</p>
+                    
+                    <div class="columns chart-columns" style="margin-top: 1rem;">
+                        <div class="column">
+                            <div class="card" style="padding: 1rem; text-align: center;">
+                                <i class="fas fa-chart-bar" style="font-size: 2.5rem; color: var(--primary-color); margin-bottom: 0.5rem;"></i>
+                                <h4>Gráficos de Barras</h4>
+                                <p>Ideal para comparações entre categorias</p>
+                            </div>
+                        </div>
+                        <div class="column">
+                            <div class="card" style="padding: 1rem; text-align: center;">
+                                <i class="fas fa-chart-line" style="font-size: 2.5rem; color: var(--accent-color); margin-bottom: 0.5rem;"></i>
+                                <h4>Gráficos de Linha</h4>
+                                <p>Perfeito para análise de tendências</p>
+                            </div>
+                        </div>
+                        <div class="column">
+                            <div class="card" style="padding: 1rem; text-align: center;">
+                                <i class="fas fa-chart-pie" style="font-size: 2.5rem; color: var(--secondary-color); margin-bottom: 0.5rem;"></i>
+                                <h4>Gráficos de Pizza</h4>
+                                <p>Ótimo para distribuição proporcional</p>
+                            </div>
+                        </div>
+                        <div class="column">
+                            <div class="card" style="padding: 1rem; text-align: center;">
+                                <i class="fas fa-table" style="font-size: 2.5rem; color: var(--success-color); margin-bottom: 0.5rem;"></i>
+                                <h4>Tabelas Dinâmicas</h4>
+                                <p>Para análise cruzada de dados</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="callout warning" style="margin-top: 1.5rem;">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <div class="callout-content">
+                        <p>Cada tipo de relatório está disponível conforme seu perfil de acesso. Caso necessite de um relatório específico, entre em contato com o administrador do sistema.</p>
+                    </div>
+                </div>
+            </div>
+            <img src="CyberGo.jpg" alt="CyberGo Logo" class="slide-logo">
+            <div class="slide-number">06</div>
+        </div>
+        
+        <!-- Slide 7: Gestão de Usuários -->
+        <div class="slide" id="slide-7" data-title="Gestão de Usuários">
+            <div class="slide-header">
+                <h2 class="slide-title"><i class="fas fa-user-shield"></i> Gestão de Usuários</h2>
+            </div>
+            <div class="slide-content">
+                <div class="columns">
+                    <div class="column">
+                        <div class="card">
+                            <h3><i class="fas fa-users"></i> Perfis de Acesso</h3>
+                            <p>O sistema possui diferentes perfis de acesso com permissões específicas:</p>
+                            <ul>
+                                <li><span style="font-weight: 600;">Administrador</span> - Controle total do sistema</li>
+                                <li><span style="font-weight: 600;">Gestor</span> - Gerenciamento de pedidos e relatórios</li>
+                                <li><span style="font-weight: 600;">Operacional</span> - Processamento de pedidos</li>
+                                <li><span style="font-weight: 600;">Escola</span> - Criação e acompanhamento de pedidos</li>
+                                <li><span style="font-weight: 600;">Visualizador</span> - Apenas consultas e relatórios</li>
+                                <li><span style="font-weight: 600;">Suporte</span> - Atendimento e resolução de problemas</li>
+                            </ul>
+                            
+                            <div class="callout important">
+                                <i class="fas fa-exclamation-circle"></i>
+                                <div class="callout-content">
+                                    <p>O nível de acesso determina quais funcionalidades e dados estarão disponíveis. Cada usuário deve ter apenas as permissões necessárias para sua função.</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card">
+                            <h3><i class="fas fa-key"></i> Segurança e Acesso</h3>
+                            <p>O sistema adota medidas rigorosas de segurança:</p>
+                            <ul>
+                                <li><span style="font-weight: 600;">Autenticação segura</span> - Senhas fortes e criptografadas</li>
+                                <li><span style="font-weight: 600;">Autenticação em duas etapas</span> - Proteção adicional</li>
+                                <li><span style="font-weight: 600;">Controle de sessão</span> - Logout automático por inatividade</li>
+                                <li><span style="font-weight: 600;">Registro de ações</span> - Log de atividades dos usuários</li>
+                                <li><span style="font-weight: 600;">Bloqueio por tentativas</span> - Proteção contra invasão</li>
+                            </ul>
+                            
+                            <div class="callout warning">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                <div class="callout-content">
+                                    <p>Nunca compartilhe suas credenciais de acesso. Por motivos de segurança, altere sua senha regularmente e use combinações fortes com letras, números e caracteres especiais.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="column">
+                        <div class="card">
+                            <h3><i class="fas fa-user-cog"></i> Gerenciamento de Perfil</h3>
+                            <p>Cada usuário pode gerenciar seu próprio perfil:</p>
+                            <ul>
+                                <li><span style="font-weight: 600;">Dados pessoais</span> - Atualize suas informações básicas</li>
+                                <li><span style="font-weight: 600;">Foto de perfil</span> - Personalize sua identificação</li>
+                                <li><span style="font-weight: 600;">Alteração de senha</span> - Atualize suas credenciais</li>
+                                <li><span style="font-weight: 600;">Preferências de notificação</span> - Configure alertas</li>
+                                <li><span style="font-weight: 600;">Tema da interface</span> - Personalize a aparência</li>
+                            </ul>
+                            
+                            <p style="margin-top: 1rem;">Para acessar seu perfil:</p>
+                            <ol>
+                                <li>Clique no seu nome/foto no canto superior direito</li>
+                                <li>Selecione "Meu Perfil" no menu suspenso</li>
+                                <li>Acesse as diferentes abas para gerenciar suas informações</li>
+                            </ol>
+                        </div>
+                        
+                        <div class="card">
+                            <h3><i class="fas fa-bell"></i> Sistema de Notificações</h3>
+                            <p>Mantenha-se informado sobre eventos importantes:</p>
+                            <ul>
+                                <li><span style="font-weight: 600;">Notificações no sistema</span> - Alertas na interface</li>
+                                <li><span style="font-weight: 600;">E-mail</span> - Comunicações importantes</li>
+                                <li><span style="font-weight: 600;">Painel de notificações</span> - Histórico de alertas</li>
+                                <li><span style="font-weight: 600;">Alertas personalizados</span> - Configure conforme necessidade</li>
+                            </ul>
+                            
+                            <div class="callout tip">
+                                <i class="fas fa-lightbulb"></i>
+                                <div class="callout-content">
+                                    <p>Configure suas preferências de notificação para receber apenas os alertas relevantes para sua função, evitando excesso de mensagens.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 1.5rem;">
+                    <h3 style="margin-bottom: 1rem;">Ciclo de Vida do Usuário</h3>
+                    <p>O processo de gestão de usuários inclui as seguintes etapas:</p>
+                    
+                    <div class="status-flow" style="margin-top: 1.5rem;">
+                        <div class="status-step">
+                            <div class="status-icon active">
+                                <i class="fas fa-user-plus"></i>
+                            </div>
+                            <div class="status-label">Cadastro</div>
+                            <div class="status-description">Criação do usuário</div>
+                        </div>
+                        
+                        <div class="status-step">
+                            <div class="status-icon active">
+                                <i class="fas fa-user-check"></i>
+                            </div>
+                            <div class="status-label">Ativação</div>
+                            <div class="status-description">Definição de perfil</div>
+                        </div>
+                        
+                        <div class="status-step">
+                            <div class="status-icon active">
+                                <i class="fas fa-user-shield"></i>
+                            </div>
+                            <div class="status-label">Permissões</div>
+                            <div class="status-description">Configuração de acesso</div>
+                        </div>
+                        
+                        <div class="status-step">
+                            <div class="status-icon">
+                                <i class="fas fa-user-clock"></i>
+                            </div>
+                            <div class="status-label">Monitoramento</div>
+                            <div class="status-description">Acompanhamento</div>
+                        </div>
+                        
+                        <div class="status-step">
+                            <div class="status-icon">
+                                <i class="fas fa-user-edit"></i>
+                            </div>
+                            <div class="status-label">Atualização</div>
+                            <div class="status-description">Revisão periódica</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="callout">
+                    <i class="fas fa-info-circle"></i>
+                    <div class="callout-content">
+                        <p>Usuários inativos por mais de 90 dias são automaticamente suspendidos por medida de segurança. Entre em contato com o administrador caso precise reativar seu acesso.</p>
+                    </div>
+                </div>
+            </div>
+            <img src="CyberGo.jpg" alt="CyberGo Logo" class="slide-logo">
+            <div class="slide-number">07</div>
+        </div>
+        
+        <!-- Slide 8: Suporte e Ajuda -->
+        <div class="slide" id="slide-8" data-title="Suporte e Ajuda">
+            <div class="slide-header">
+                <h2 class="slide-title"><i class="fas fa-headset"></i> Suporte e Ajuda</h2>
+            </div>
+            <div class="slide-content">
+                <div class="columns">
+                    <div class="column">
+                        <div class="card">
+                            <h3><i class="fas fa-question-circle"></i> Central de Ajuda</h3>
+                            <p>O sistema oferece diversos recursos de auxílio ao usuário:</p>
+                            <ul>
+                                <li><span style="font-weight: 600;">Documentação online</span> - Manuais e guias detalhados</li>
+                                <li><span style="font-weight: 600;">Tutoriais em vídeo</span> - Demonstrações passo a passo</li>
+                                <li><span style="font-weight: 600;">FAQ</span> - Perguntas frequentes</li>
+                                <li><span style="font-weight: 600;">Dicas contextuais</span> - Ajuda conforme a tela</li>
+                                <li><span style="font-weight: 600;">Tours guiados</span> - Apresentação das funcionalidades</li>
+                            </ul>
+                            
+                            <p style="margin-top: 1rem;">Para acessar a Central de Ajuda:</p>
+                            <ol>
+                                <li>Clique no ícone <i class="fas fa-question-circle"></i> no canto superior direito</li>
+                                <li>Selecione a opção desejada no menu</li>
+                                <li>Navegue pelo conteúdo ou use a busca para tópicos específicos</li>
+                            </ol>
+                        </div>
+                        
+                        <div class="card">
+                            <h3><i class="fas fa-ticket-alt"></i> Sistema de Chamados</h3>
+                            <p>Para problemas técnicos ou dúvidas específicas, abra um chamado:</p>
+                            <ol>
+                                <li><span style="font-weight: 600;">Acesse "Suporte > Abrir Chamado"</span> no menu principal</li>
+                                <li><span style="font-weight: 600;">Selecione a categoria</span> do problema ou dúvida</li>
+                                <li><span style="font-weight: 600;">Descreva detalhadamente</span> a situação</li>
+                                <li><span style="font-weight: 600;">Anexe prints de tela</span> se necessário</li>
+                                <li><span style="font-weight: 600;">Envie o chamado</span> e aguarde o atendimento</li>
+                            </ol>
+                            
+                            <div class="callout tip">
+                                <i class="fas fa-lightbulb"></i>
+                                <div class="callout-content">
+                                    <p>Quanto mais detalhes você fornecer ao abrir um chamado, mais rápido e eficiente será o atendimento. Inclua sempre prints de tela quando possível.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="column">
+                        <div class="card">
+                            <h3><i class="fas fa-comments"></i> Canais de Atendimento</h3>
+                            <p>O suporte do CyberGo está disponível por diversos canais:</p>
+                            <ul>
+                                <li><span style="font-weight: 600;">Chat online</span> - Atendimento em tempo real</li>
+                                <li><span style="font-weight: 600;">E-mail</span> - suporte@cybergo.com.br</li>
+                                <li><span style="font-weight: 600;">Telefone</span> - (11) 3456-7890</li>
+                                <li><span style="font-weight: 600;">WhatsApp</span> - (11) 98765-4321</li>
+                                <li><span style="font-weight: 600;">Atendimento presencial</span> - Sob agendamento</li>
+                            </ul>
+                            
+                            <p style="margin-top: 1rem;"><span style="font-weight: 600;">Horário de atendimento:</span></p>
+                            <ul>
+                                <li>Segunda a sexta: 08h às 18h</li>
+                                <li>Plantão 24h para emergências</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="card">
+                            <h3><i class="fas fa-chalkboard-teacher"></i> Treinamentos</h3>
+                            <p>O CyberGo oferece treinamentos regulares para usuários:</p>
+                            <ul>
+                                <li><span style="font-weight: 600;">Onboarding</span> - Treinamento inicial para novos usuários</li>
+                                <li><span style="font-weight: 600;">Webinars</span> - Sessões online sobre funcionalidades</li>
+                                <li><span style="font-weight: 600;">Workshops</span> - Capacitação prática em grupo</li>
+                                <li><span style="font-weight: 600;">Treinamentos personalizados</span> - Conforme necessidade</li>
+                                <li><span style="font-weight: 600;">Certificações</span> - Para usuários avançados</li>
+                            </ul>
+                            
+                            <div class="callout">
+                                <i class="fas fa-info-circle"></i>
+                                <div class="callout-content">
+                                    <p>Para solicitar treinamentos específicos ou consultar a agenda de webinars, acesse "Suporte > Treinamentos" no menu principal.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card" style="margin-top: 1.5rem;">
+                    <h3><i class="fas fa-star"></i> Melhores Práticas</h3>
+                    <p>Recomendações para aproveitar ao máximo o sistema:</p>
+                    
+                    <div class="columns" style="margin-top: 1rem;">
+                        <div class="column">
+                            <ul>
+                                <li><span style="font-weight: 600;">Mantenha seus dados atualizados</span> - Especialmente contatos</li>
+                                <li><span style="font-weight: 600;">Utilize os filtros avançados</span> - Para encontrar informações rapidamente</li>
+                                <li><span style="font-weight: 600;">Salve seus relatórios favoritos</span> - Para acesso rápido</li>
+                                <li><span style="font-weight: 600;">Planeje seus pedidos</span> - Evite solicitações de última hora</li>
+                            </ul>
+                        </div>
+                        <div class="column">
+                            <ul>
+                                <li><span style="font-weight: 600;">Acompanhe o status dos pedidos</span> - Para evitar surpresas</li>
+                                <li><span style="font-weight: 600;">Participe dos treinamentos</span> - Para conhecer novas funcionalidades</li>
+                                <li><span style="font-weight: 600;">Forneça feedback</span> - Para melhoria contínua do sistema</li>
+                                <li><span style="font-weight: 600;">Consulte a documentação</span> - Antes de abrir chamados</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="callout warning" style="margin-top: 1.5rem;">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <div class="callout-content">
+                        <p>Em caso de problemas críticos que impeçam o uso do sistema, utilize o canal de emergência pelo telefone (11) 93413-5250 ou e-mail suporte@cyberforce.com.br.</p>
+                    </div>
+                </div>
+            </div>
+            <img src="CyberGo.jpg" alt="CyberGo Logo" class="slide-logo">
+            <div class="slide-number">08</div>
+        </div>
+
+        <!-- Slide 9: Dicas Avançadas e Conclusão -->
+        <div class="slide" id="slide-9" data-title="Dicas e Conclusão">
+            <div class="slide-header">
+                <h2 class="slide-title"><i class="fas fa-award"></i> Dicas Avançadas e Conclusão</h2>
+            </div>
+            <div class="slide-content">
+                <div class="columns">
+                    <div class="column">
+                        <div class="card">
+                            <h3><i class="fas fa-rocket"></i> Funcionalidades Avançadas</h3>
+                            <p>Recursos especiais para usuários experientes:</p>
+                            <ul>
+                                <li><span style="font-weight: 600;">Preenchimento em Lote</span> - Importação de múltiplos itens</li>
+                                <li><span style="font-weight: 600;">Modelos Personalizados</span> - Templates para pedidos frequentes</li>
+                                <li><span style="font-weight: 600;">API de Integração</span> - Conexão com outros sistemas</li>
+                                <li><span style="font-weight: 600;">Widgets Personalizáveis</span> - Dashboard customizado</li>
+                                <li><span style="font-weight: 600;">Exportação Avançada</span> - Formatos especiais de dados</li>
+                                <li><span style="font-weight: 600;">Automações</span> - Tarefas programadas</li>
+                            </ul>
+                            
+                            <div class="callout tip">
+                                <i class="fas fa-lightbulb"></i>
+                                <div class="callout-content">
+                                    <p>Para acessar as funcionalidades avançadas, consulte nossa seção de "Recursos Especiais" na Central de Ajuda ou participe de nossos treinamentos específicos.</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card">
+                            <h3><i class="fas fa-keyboard"></i> Atalhos de Teclado</h3>
+                            <p>Aumente sua produtividade com estes atalhos:</p>
+                            
+                            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.5rem; margin-top: 1rem;">
+                                <div style="display: flex; align-items: center;">
+                                    <span style="font-weight: 600; background: #f1f5f9; padding: 0.25rem 0.5rem; border-radius: 4px; margin-right: 0.5rem;">F1</span>
+                                    <span>Ajuda contextual</span>
+                                </div>
+                                <div style="display: flex; align-items: center;">
+                                    <span style="font-weight: 600; background: #f1f5f9; padding: 0.25rem 0.5rem; border-radius: 4px; margin-right: 0.5rem;">F2</span>
+                                    <span>Busca rápida</span>
+                                </div>
+                                <div style="display: flex; align-items: center;">
+                                    <span style="font-weight: 600; background: #f1f5f9; padding: 0.25rem 0.5rem; border-radius: 4px; margin-right: 0.5rem;">Ctrl+N</span>
+                                    <span>Novo pedido</span>
+                                </div>
+                                <div style="display: flex; align-items: center;">
+                                    <span style="font-weight: 600; background: #f1f5f9; padding: 0.25rem 0.5rem; border-radius: 4px; margin-right: 0.5rem;">Ctrl+S</span>
+                                    <span>Salvar</span>
+                                </div>
+                                <div style="display: flex; align-items: center;">
+                                    <span style="font-weight: 600; background: #f1f5f9; padding: 0.25rem 0.5rem; border-radius: 4px; margin-right: 0.5rem;">Ctrl+P</span>
+                                    <span>Imprimir</span>
+                                </div>
+                                <div style="display: flex; align-items: center;">
+                                    <span style="font-weight: 600; background: #f1f5f9; padding: 0.25rem 0.5rem; border-radius: 4px; margin-right: 0.5rem;">Ctrl+F</span>
+                                    <span>Filtrar lista</span>
+                                </div>
+                                <div style="display: flex; align-items: center;">
+                                    <span style="font-weight: 600; background: #f1f5f9; padding: 0.25rem 0.5rem; border-radius: 4px; margin-right: 0.5rem;">Esc</span>
+                                    <span>Cancelar/Fechar</span>
+                                </div>
+                                <div style="display: flex; align-items: center;">
+                                    <span style="font-weight: 600; background: #f1f5f9; padding: 0.25rem 0.5rem; border-radius: 4px; margin-right: 0.5rem;">Alt+Home</span>
+                                    <span>Dashboard</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="column">
+                        <div class="card">
+                            <h3><i class="fas fa-mobile-alt"></i> Acesso Móvel</h3>
+                            <p>O CyberGo está disponível também em dispositivos móveis:</p>
+                            <ul>
+                                <li><span style="font-weight: 600;">Aplicativo Nativo</span> - Disponível para Android e iOS</li>
+                                <li><span style="font-weight: 600;">Versão Web Responsiva</span> - Acesso pelo navegador</li>
+                                <li><span style="font-weight: 600;">Notificações Push</span> - Alertas instantâneos</li>
+                                <li><span style="font-weight: 600;">Modo Offline</span> - Continue trabalhando sem internet</li>
+                                <li><span style="font-weight: 600;">Scanner de QR Code</span> - Para rápida identificação</li>
+                                <li><span style="font-weight: 600;">Sincronização Automática</span> - Dados sempre atualizados</li>
+                            </ul>
+                            
+                            <div style="display: flex; justify-content: center; gap: 1rem; margin-top: 1rem;">
+                                <div style="text-align: center;">
+                                    <i class="fab fa-android" style="font-size: 2.5rem; color: #3ddc84;"></i>
+                                    <p>Android</p>
+                                </div>
+                                <div style="text-align: center;">
+                                    <i class="fab fa-apple" style="font-size: 2.5rem; color: #555;"></i>
+                                    <p>iOS</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card">
+                            <h3><i class="fas fa-code-branch"></i> Atualizações e Novidades</h3>
+                            <p>O CyberGo está em constante evolução:</p>
+                            <ul>
+                                <li><span style="font-weight: 600;">Calendário de Atualizações</span> - Programação de melhorias</li>
+                                <li><span style="font-weight: 600;">Blog de Novidades</span> - Anúncios de novas funcionalidades</li>
+                                <li><span style="font-weight: 600;">Programa de Beta Testers</span> - Experimente antes</li>
+                                <li><span style="font-weight: 600;">Canal de Sugestões</span> - Contribua para o desenvolvimento</li>
+                                <li><span style="font-weight: 600;">Newsletter Mensal</span> - Receba as novidades por e-mail</li>
+                            </ul>
+                            
+                            <div class="callout">
+                                <i class="fas fa-info-circle"></i>
+                                <div class="callout-content">
+                                    <p>Acesse o blog do CyberGo em blog.cybergo.com.br para ficar por dentro das novidades e dicas de uso do sistema.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="text-align: center; margin-top: 2rem;">
+                    <h2 style="margin-bottom: 1rem; color: var(--primary-color);">Obrigado por escolher o CyberGo!</h2>
+                    <p style="font-size: 1.1rem; max-width: 800px; margin: 0 auto 1.5rem;">Estamos comprometidos em proporcionar a melhor experiência possível para a gestão de contratos e pedidos. Contamos com seu feedback para continuar melhorando nossos serviços.</p>
+                    
+                    <div style="display: flex; justify-content: center; gap: 1.5rem; margin-top: 1.5rem;">
+                        <div style="text-align: center;">
+                            <i class="fas fa-envelope" style="font-size: 2rem; color: var(--primary-color); margin-bottom: 0.5rem;"></i>
+                            <p style="font-weight: 600;">contato@cyberforce.com.br</p>
+                        </div>
+                        <div style="text-align: center;">
+                            <i class="fas fa-globe" style="font-size: 2rem; color: var(--primary-color); margin-bottom: 0.5rem;"></i>
+                            <p style="font-weight: 600;">www.cyberforce.com.br</p>
+                        </div>
+                        <div style="text-align: center;">
+                            <i class="fas fa-phone-alt" style="font-size: 2rem; color: var(--primary-color); margin-bottom: 0.5rem;"></i>
+                            <p style="font-weight: 600;">(11)93413-5250 </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <img src="CyberGo.jpg" alt="CyberGo Logo" class="slide-logo">
+            <div class="slide-number">09</div>
+        </div>
+    </div>
+
+    <!-- Botões de ação -->
+    <div class="action-buttons">
+        <button class="action-btn" onclick="window.print()" title="Imprimir apresentação">
+            <i class="fas fa-print"></i>
+        </button>
+        <button class="action-btn secondary" onclick="toggleInstructions()" title="Instruções para impressão">
+            <i class="fas fa-question"></i>
+        </button>
+    </div>
+
+    <!-- Instruções para impressão -->
+    <div class="print-instructions" id="printInstructions">
+        <h3>Instruções para impressão em PDF</h3>
+        <ol>
+            <li>Clique no botão de impressão azul ou use <kbd>Ctrl+P</kbd></li>
+            <li>Escolha "Salvar como PDF" como destino</li>
+            <li>Nas configurações, selecione:
+                <ul>
+                    <li>Orientação: <strong>Paisagem</strong></li>
+                    <li>Tamanho: A4</li>
+                    <li>Margens: Padrão</li>
+                    <li>Escala: 100%</li>
+                </ul>
+            </li>
+            <li>Certifique-se de marcar "Plano de fundo" nas opções</li>
+            <li>Clique em "Salvar" para gerar o PDF</li>
+        </ol>
+    </div>
+
+    <script>
+        // Função para alternar instruções de impressão
+        function toggleInstructions() {
+            const instructions = document.getElementById('printInstructions');
+            instructions.classList.toggle('show');
+        }
+
+        // Inicializar slides
+        document.addEventListener('DOMContentLoaded', function() {
+            // Adiciona atributos data-title aos slides se não existirem
+            const slides = document.querySelectorAll('.slide');
+            slides.forEach((slide, index) => {
+                if (!slide.hasAttribute('id')) {
+                    slide.id = `slide-${index + 1}`;
+                }
+                if (!slide.hasAttribute('data-title')) {
+                    const titleEl = slide.querySelector('.slide-title');
+                    if (titleEl) {
+                        let title = titleEl.textContent.trim();
+                        // Remover ícones
+                        title = title.replace(/^[^\w]+/, '').trim();
+                        slide.setAttribute('data-title', title);
+                    }
+                }
+            });
+            
+            // Adiciona evento para garantir impressão em paisagem
+            window.addEventListener('beforeprint', configurePrintLandscape);
+
+            // Ajusta a altura dos cartões em colunas para ficarem alinhados
+            adjustCardHeights();
+            window.addEventListener('resize', adjustCardHeights);
+        });
+        
+        // Função para ajustar alturas dos cartões
+        function adjustCardHeights() {
+            // Para cada conjunto de colunas
+            document.querySelectorAll('.columns').forEach(columnContainer => {
+                // Reset para medição
+                columnContainer.querySelectorAll('.card').forEach(card => {
+                    card.style.height = 'auto';
+                });
+                
+                // Aplicando somente para visualização na tela (não para impressão)
+                if (window.matchMedia('print').matches) return;
+                
+                // Agrupando cartões por linha (mesma posição Y)
+                const rows = {};
+                columnContainer.querySelectorAll('.card').forEach(card => {
+                    const rect = card.getBoundingClientRect();
+                    const rowKey = Math.round(rect.top);
+                    
+                    if (!rows[rowKey]) rows[rowKey] = [];
+                    rows[rowKey].push(card);
+                });
+                
+                // Para cada linha, encontra a altura máxima e aplica a todos
+                Object.values(rows).forEach(cardsInRow => {
+                    if (cardsInRow.length <= 1) return;
+                    
+                    const maxHeight = Math.max(...cardsInRow.map(card => card.offsetHeight));
+                    cardsInRow.forEach(card => {
+                        card.style.height = `${maxHeight}px`;
+                    });
+                });
+            });
+        }
+        
+        // Configurar para impressão em paisagem
+        function configurePrintLandscape() {
+            // Caso o navegador seja compatível com matchMedia Print
+            if (window.matchMedia) {
+                const mediaQueryList = window.matchMedia('print');
+                mediaQueryList.addEventListener('change', function(mql) {
+                    if (mql.matches) {
+                        document.documentElement.style.setProperty('--print-orientation', 'landscape');
+                        // Adiciona classe para forçar modo paisagem
+                        document.body.classList.add('force-landscape');
+                        
+                        // Garantir que nenhum conteúdo seja cortado
+                        document.querySelectorAll('.card').forEach(card => {
+                            card.style.height = 'auto';
+                        });
+                    } else {
+                        document.body.classList.remove('force-landscape');
+                        // Reajusta alturas após a impressão
+                        setTimeout(adjustCardHeights, 300);
+                    }
+                });
+            }
+            
+            // Adiciona classe para forçar modo paisagem
+            document.body.classList.add('force-landscape');
+            
+            // Garantir que nenhum conteúdo seja cortado
+            document.querySelectorAll('.card').forEach(card => {
+                card.style.height = 'auto';
+            });
+            
+            // Em alguns navegadores, isso pode ajudar
+            setTimeout(function() {
+                // Adiciona instruções diretamente no console para o usuário
+                console.log('%c IMPORTANTE: Selecione "Paisagem" nas opções de impressão ', 'background: #f97316; color: white; font-size: 14px; font-weight: bold; padding: 5px;');
+            }, 100);
+        }
+    </script>
+</body>
+</html> 

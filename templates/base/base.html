@@ -742,11 +742,15 @@
                     '<i class="bi bi-gear-fill me-2"></i> Configurações' +
                     '</a>' +
                     '<div style="border-top: 1px solid #eee; margin: 8px 0;"></div>';
+                    
                 {% endif %}
                 
                 // Itens comuns para todos os usuários
                 menuHTML += '<a class="custom-dropdown-item" href="{% url "usuarios:perfil" %}" style="display: block; padding: 10px 20px; color: #333; text-decoration: none; transition: all 0.2s ease;">' +
                     '<i class="bi bi-person-circle me-2"></i> Meu Perfil' +
+                    '</a>' +
+                    '<a class="custom-dropdown-item" href="{% url "core:manual_usuario" %}" target="_blank" style="display: block; padding: 10px 20px; color: #333; text-decoration: none; transition: all 0.2s ease;">' +
+                    '<i class="bi bi-file-earmark-text me-2"></i> Manual do usuário' +
                     '</a>' +
                     '<a class="custom-dropdown-item" href="javascript:void(0)" onclick="fazerLogout()" style="display: block; padding: 10px 20px; color: #dc3545; text-decoration: none; transition: all 0.2s ease;">' +
                     '<i class="bi bi-box-arrow-right me-2"></i> Sair' +

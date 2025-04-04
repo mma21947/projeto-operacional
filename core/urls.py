@@ -14,4 +14,5 @@ urlpatterns = [
     path('exportar-dados/', views.exportar_dados, name='exportar_dados'),
     path('limpar-temporarios/', views.limpar_temporarios, name='limpar_temporarios'),
     path('diagnostico-endereco/', views.diagnostico_endereco, name='diagnostico_endereco'),
+    path('manual-usuario/', views.manual_usuario, name='manual_usuario'),
 ] 
