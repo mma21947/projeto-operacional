@@ -1,0 +1,106 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Configurações do Sistema{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2><i class="bi bi-gear me-2"></i>Configurações do Sistema</h2>
+</div>
+
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <div class="card">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">Informações da Empresa</h5>
+            </div>
+            <div class="card-body">
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-8">
+                            <label for="id_nome_empresa" class="form-label">Nome da Empresa</label>
+                            <input type="text" name="nome_empresa" id="id_nome_empresa" class="form-control" 
+                                   value="{{ configuracao.nome_empresa }}" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label for="id_cnpj" class="form-label">CNPJ</label>
+                            <input type="text" name="cnpj" id="id_cnpj" class="form-control" 
+                                   value="{{ configuracao.cnpj }}">
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="id_endereco" class="form-label">Endereço</label>
+                        <textarea name="endereco" id="id_endereco" class="form-control" 
+                                  rows="3">{{ configuracao.endereco }}</textarea>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="id_telefone" class="form-label">Telefone</label>
+                            <input type="text" name="telefone" id="id_telefone" class="form-control" 
+                                   value="{{ configuracao.telefone }}">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="id_email" class="form-label">E-mail</label>
+                            <input type="email" name="email" id="id_email" class="form-control" 
+                                   value="{{ configuracao.email }}">
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="id_logo" class="form-label">Logo da Empresa</label>
+                        {% if configuracao.logo %}
+                            <div class="mb-2">
+                                <img src="{{ configuracao.logo.url }}" alt="Logo da empresa" class="img-thumbnail" style="max-height: 100px;">
+                            </div>
+                        {% endif %}
+                        <input type="file" name="logo" id="id_logo" class="form-control">
+                        <div class="form-text">Formatos aceitos: JPG, PNG. Tamanho máximo: 2MB.</div>
+                    </div>
+                    
+                    <div class="text-end">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-save me-1"></i> Salvar Configurações
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-8 mx-auto">
+        <div class="card">
+            <div class="card-header bg-white">
+                <h5 class="mb-0">Backup e Manutenção</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-flex justify-content-between mb-3">
+                    <div>
+                        <h6 class="mb-1">Exportar todos os dados</h6>
+                        <p class="text-muted mb-0">Exporta todos os dados do sistema em arquivos Excel</p>
+                    </div>
+                    <a href="{% url 'core:exportar_dados' %}" class="btn btn-outline-primary align-self-center">
+                        <i class="bi bi-download me-1"></i> Exportar
+                    </a>
+                </div>
+                
+                <hr>
+                
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h6 class="mb-1">Limpar dados temporários</h6>
+                        <p class="text-muted mb-0">Remove arquivos temporários e otimiza o banco de dados</p>
+                    </div>
+                    <a href="{% url 'core:limpar_temporarios' %}" class="btn btn-outline-danger align-self-center">
+                        <i class="bi bi-trash me-1"></i> Limpar
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

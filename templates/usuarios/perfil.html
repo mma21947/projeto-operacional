@@ -1,0 +1,44 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Meu Perfil - Sistema de Pedidos{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">Meu Perfil</h4>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h5>Informações Pessoais</h5>
+                        <p><strong>Usuário:</strong> {{ usuario.username }}</p>
+                        <p><strong>Nome:</strong> {{ usuario.first_name }} {{ usuario.last_name }}</p>
+                        <p><strong>Email:</strong> {{ usuario.email }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <h5>Informações do Sistema</h5>
+                        <p><strong>Data do último login:</strong> {{ usuario.last_login|date:"d/m/Y H:i" }}</p>
+                        <p><strong>Data do cadastro:</strong> {{ usuario.date_joined|date:"d/m/Y" }}</p>
+                        <p><strong>Perfil:</strong> 
+                            {% if usuario.is_superuser %}
+                                Administrador
+                            {% else %}
+                                {% for grupo in usuario.groups.all %}
+                                    {{ grupo.name }}{% if not forloop.last %}, {% endif %}
+                                {% empty %}
+                                    Usuário Padrão
+                                {% endfor %}
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+                <div class="mt-4 text-center">
+                    <a href="{% url 'core:home' %}" class="btn btn-secondary">Voltar ao Início</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

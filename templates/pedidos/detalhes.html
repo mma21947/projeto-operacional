@@ -1,0 +1,969 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Detalhes do Pedido{% endblock %}
+
+{% block content %}
+{% load math_filters %}
+<div class="main-content">
+    <div class="page-header no-print">
+        <h2>
+            <i class="bi bi-cart me-2"></i>
+            Detalhes do Pedido #{{ pedido.id }}
+        </h2>
+        <div>
+            {% if pedido.status == 'pendente' or pedido.status == 'cancelado' or user|has_group:'Gerente Operacional' or user.is_staff %}
+            <a href="{% url 'pedidos:editar' pedido.pk %}" class="btn btn-primary">
+                <i class="bi bi-pencil me-1"></i> Editar
+            </a>
+            
+            {% if pedido.status == 'pendente' or not user|has_group:'Operador de Pedidos' %}
+            <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#modalExcluirPedido">
+                <i class="bi bi-trash me-1"></i> Excluir
+            </button>
+            {% endif %}
+            {% endif %}
+            
+            <a href="{% url 'pedidos:duplicar' pedido.pk %}" class="btn btn-info" title="Criar uma cópia deste pedido">
+                <i class="bi bi-files me-1"></i> Duplicar Pedido
+            </a>
+            
+            <a href="{% url 'pedidos:lista' %}" class="btn btn-secondary">
+                <i class="bi bi-arrow-left me-1"></i> Voltar
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">Informações do Pedido</h5>
+                </div>
+                <div class="card-body">
+                    <table class="table table-details">
+                        <tbody>
+                            <tr>
+                                <th width="200">Contrato</th>
+                                <td>
+                                    <a href="{% url 'escolas:detalhes' pedido.escola.pk %}">{{ pedido.escola.nome }}</a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Status</th>
+                                <td>
+                                    {% if pedido.status == 'pendente' %}
+                                    <span class="badge bg-warning">Pendente</span>
+                                    {% elif pedido.status == 'aprovado' %}
+                                    <span class="badge bg-info">Aprovado</span>
+                                    {% elif pedido.status == 'pedido_enviado' %}
+                                    <span class="badge bg-primary">Pedido Enviado</span>
+                                    {% elif pedido.status == 'entregue' %}
+                                    <span class="badge bg-success">Entregue</span>
+                                    {% elif pedido.status == 'cancelado' %}
+                                    <span class="badge bg-danger">Cancelado</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <th>Data de Solicitação</th>
+                                <td>{{ pedido.data_solicitacao|date:"d/m/Y H:i" }}</td>
+                            </tr>
+                            {% if pedido.data_aprovacao %}
+                            <tr>
+                                <th>Data de Aprovação</th>
+                                <td>{{ pedido.data_aprovacao|date:"d/m/Y H:i" }}</td>
+                            </tr>
+                            {% endif %}
+                            {% if pedido.data_envio %}
+                            <tr>
+                                <th>Data de Envio</th>
+                                <td>{{ pedido.data_envio|date:"d/m/Y H:i" }}</td>
+                            </tr>
+                            {% endif %}
+                            {% if pedido.data_entrega %}
+                            <tr>
+                                <th>Data de Entrega</th>
+                                <td>{{ pedido.data_entrega|date:"d/m/Y H:i" }}</td>
+                            </tr>
+                            {% endif %}
+                            {% if pedido.recebido_por %}
+                            <tr>
+                                <th>Recebido por</th>
+                                <td>{{ pedido.recebido_por }}</td>
+                            </tr>
+                            {% endif %}
+                            <tr>
+                                <th>Observações</th>
+                                <td>{{ pedido.observacoes|default:"-"|linebreaks }}</td>
+                            </tr>
+                            {% if pedido.status == 'cancelado' and pedido.justificativa_cancelamento %}
+                            <tr>
+                                <th>Justificativa de Cancelamento</th>
+                                <td class="text-danger">{{ pedido.justificativa_cancelamento|linebreaks }}</td>
+                            </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Itens do Pedido</h5>
+                    <span class="badge rounded-pill bg-primary">{{ pedido.itens.count }} item(ns)</span>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Produto</th>
+                                    <th class="text-center">Quantidade</th>
+                                    <th class="text-end">Valor Unitário</th>
+                                    <th class="text-end">Valor Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in pedido.itens.all %}
+                                <tr>
+                                    <td>{{ item.produto.nome }}</td>
+                                    <td class="text-center">{{ item.quantidade }}</td>
+                                    <td class="text-end">R$ {{ item.valor_unitario }}</td>
+                                    <td class="text-end">R$ {{ item.valor_total }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <th colspan="3" class="text-end">Valor Total do Pedido:</th>
+                                    <th class="text-end">R$ {{ pedido.valor_total }}</th>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">Dados do Contrato</h5>
+                </div>
+                <div class="card-body">
+                    <h6 class="mb-2">{{ pedido.escola.nome }}</h6>
+                    {% if pedido.escola.empresa %}
+                    <p class="mb-2">
+                        <i class="bi bi-building me-2"></i>
+                        <strong>Empresa:</strong> {{ pedido.escola.empresa }}
+                    </p>
+                    {% endif %}
+                    {% if pedido.escola.lote %}
+                    <p class="mb-2">
+                        <i class="bi bi-box me-2"></i>
+                        <strong>Lote:</strong> {{ pedido.escola.lote }}
+                    </p>
+                    {% endif %}
+                    
+                    {% if pedido.escola.budget > 0 %}
+                    <div class="mt-3 mb-3">
+                        <p class="mb-1">
+                            <i class="bi bi-cash-coin me-2"></i>
+                            <strong>Orçamento do Contrato:</strong> R$ {{ pedido.escola.budget }}
+                        </p>
+                        
+                        {% if pedido.escola.data_validade_budget %}
+                        <p class="mb-1">
+                            <i class="bi bi-calendar-check me-2"></i>
+                            <strong>Validade:</strong> 
+                            <span class="{% if budget_expirado %}text-danger fw-bold{% endif %}">
+                                {{ pedido.escola.data_validade_budget|date:"d/m/Y" }}
+                                {% if budget_expirado %}
+                                <i class="bi bi-exclamation-triangle-fill text-danger ms-1" data-bs-toggle="tooltip" title="Orçamento expirado"></i>
+                                {% endif %}
+                            </span>
+                        </p>
+                        {% endif %}
+                        
+                        {% if budget_contrato and not budget_expirado %}
+                        <p class="mb-1">
+                            <strong>Valor Total Pedidos:</strong> R$ {{ valor_total_pedidos|floatformat:2 }}
+                        </p>
+                        
+                        <div class="mt-2">
+                            <div class="progress" style="height: 20px;">
+                                {% if percentual_uso > 100 %}
+                                <div class="progress-bar bg-danger" role="progressbar" style="width: 100%;" 
+                                     aria-valuenow="{{ percentual_uso|floatformat:1 }}" aria-valuemin="0" aria-valuemax="100">
+                                    {{ percentual_uso|floatformat:1 }}% (Excedido)
+                                </div>
+                                {% elif percentual_uso >= 90 %}
+                                <div class="progress-bar bg-warning" role="progressbar" style="width: {% widthratio percentual_uso 1 1 %}%;" 
+                                     aria-valuenow="{{ percentual_uso|floatformat:1 }}" aria-valuemin="0" aria-valuemax="100">
+                                    {{ percentual_uso|floatformat:1 }}%
+                                </div>
+                                {% else %}
+                                <div class="progress-bar bg-success" role="progressbar" style="width: {% widthratio percentual_uso 1 1 %}%;" 
+                                     aria-valuenow="{{ percentual_uso|floatformat:1 }}" aria-valuemin="0" aria-valuemax="100">
+                                    {{ percentual_uso|floatformat:1 }}%
+                                </div>
+                                {% endif %}
+                            </div>
+                            <small class="text-muted">Utilização do orçamento</small>
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                    
+                    {% if pedido.escola.endereco %}
+                    <p class="mb-2">
+                        <i class="bi bi-geo-alt me-2"></i>
+                        {{ pedido.escola.endereco }}
+                        <br>
+                        {% if pedido.escola.cep %}CEP: {{ pedido.escola.cep }}<br>{% endif %}
+                        {% if pedido.escola.cidade %}
+                            {{ pedido.escola.cidade }}{% if pedido.escola.estado %}/{{ pedido.escola.estado }}{% endif %}
+                        {% endif %}
+                    </p>
+                    {% endif %}
+                    
+                    {% if pedido.escola.telefone %}
+                    <p class="mb-2">
+                        <i class="bi bi-telephone me-2"></i>
+                        {{ pedido.escola.telefone }}
+                    </p>
+                    {% endif %}
+                    
+                    {% if pedido.escola.email %}
+                    <p class="mb-2">
+                        <i class="bi bi-envelope me-2"></i>
+                        <a href="mailto:{{ pedido.escola.email }}">{{ pedido.escola.email }}</a>
+                    </p>
+                    {% endif %}
+                    
+                    {% if pedido.escola.supervisor %}
+                    <p class="mt-3 mb-0">
+                        <strong>Supervisor:</strong> {{ pedido.escola.supervisor.nome }}
+                    </p>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">Ações</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="#" class="btn btn-outline-primary" onclick="printPedido(); return false;">
+                            <i class="bi bi-printer me-1"></i> Imprimir Pedido
+                        </a>
+                        
+                        {% if pedido.status == 'pendente' %}
+                        {% if not user|has_group:'Operador de Pedidos' %}
+                        <button type="button" class="btn btn-info btn-atualizar-status" data-status="aprovado">
+                            <i class="bi bi-check-circle me-1"></i> Aprovar Pedido
+                        </button>
+                        {% endif %}
+                        <button type="button" class="btn btn-danger btn-atualizar-status" data-status="cancelado">
+                            <i class="bi bi-x-circle me-1"></i> Cancelar Pedido
+                        </button>
+                        {% elif pedido.status == 'aprovado' and user.is_staff or pedido.status == 'aprovado' and user|has_group:'Gerente Operacional' %}
+                        <button type="button" class="btn btn-primary btn-atualizar-status" data-status="pedido_enviado">
+                            <i class="bi bi-truck me-1"></i> Marcar como Pedido Enviado
+                        </button>
+                        <button type="button" class="btn btn-danger btn-atualizar-status" data-status="cancelado">
+                            <i class="bi bi-x-circle me-1"></i> Cancelar Pedido
+                        </button>
+                        <div class="text-info mt-2">
+                            <i class="bi bi-info-circle me-1"></i> Apenas administradores e Gerentes Operacionais podem alterar pedidos aprovados.
+                        </div>
+                        {% elif pedido.status == 'pedido_enviado' and user.is_staff or pedido.status == 'pedido_enviado' and user|has_group:'Gerente Operacional' %}
+                        <button type="button" class="btn btn-success btn-atualizar-status" data-status="entregue">
+                            <i class="bi bi-box-seam me-1"></i> Marcar como Entregue
+                        </button>
+                        <button type="button" class="btn btn-danger btn-atualizar-status" data-status="cancelado">
+                            <i class="bi bi-x-circle me-1"></i> Cancelar Pedido
+                        </button>
+                        <div class="text-info mt-2">
+                            <i class="bi bi-info-circle me-1"></i> Apenas administradores e Gerentes Operacionais podem alterar pedidos enviados.
+                        </div>
+                        {% elif pedido.status != 'entregue' and pedido.status != 'cancelado' and user.is_staff or pedido.status != 'entregue' and pedido.status != 'cancelado' and user|has_group:'Gerente Operacional' %}
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle me-1"></i> Você possui permissões administrativas para alterar este pedido.
+                            <a href="#" class="btn btn-sm btn-primary mt-2 btn-atualizar-status" data-status="aprovado">Aprovar</a>
+                            <a href="#" class="btn btn-sm btn-success mt-2 btn-atualizar-status" data-status="pedido_enviado">Enviar</a>
+                            <a href="#" class="btn btn-sm btn-info mt-2 btn-atualizar-status" data-status="entregue">Entregar</a>
+                            <a href="#" class="btn btn-sm btn-danger mt-2 btn-atualizar-status" data-status="cancelado">Cancelar</a>
+                        </div>
+                        {% endif %}
+                        
+                        {% if user|has_group:'Operador de Pedidos' and pedido.status == 'pendente' %}
+                        <div class="text-info mt-2">
+                            <i class="bi bi-info-circle me-1"></i> Como Operador de Pedidos, você só pode imprimir ou cancelar pedidos pendentes.
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if pode_ver_logs %}
+    <!-- Seção de Logs do Pedido -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">Histórico do Pedido</h5>
+                </div>
+                <div class="card-body">
+                    {% if logs %}
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Data/Hora</th>
+                                    <th>Usuário</th>
+                                    <th>Ação</th>
+                                    <th>Status Anterior</th>
+                                    <th>Novo Status</th>
+                                    <th>Descrição</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for log in logs %}
+                                <tr>
+                                    <td>{{ log.data_hora|date:"d/m/Y H:i:s" }}</td>
+                                    <td>
+                                        {% if log.usuario %}
+                                            {{ log.usuario.get_full_name|default:log.usuario.username }}
+                                        {% else %}
+                                            <span class="text-muted">Usuário removido</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if log.acao == 'criacao' %}
+                                            <span class="badge bg-success">Criação</span>
+                                        {% elif log.acao == 'alteracao_status' %}
+                                            <span class="badge bg-primary">Alteração de Status</span>
+                                        {% elif log.acao == 'edicao' %}
+                                            <span class="badge bg-info">Edição</span>
+                                        {% elif log.acao == 'exclusao' %}
+                                            <span class="badge bg-danger">Exclusão</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">{{ log.acao }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if log.status_anterior %}
+                                            {% if log.status_anterior == 'pendente' %}
+                                                <span class="badge bg-warning">Pendente</span>
+                                            {% elif log.status_anterior == 'aprovado' %}
+                                                <span class="badge bg-info">Aprovado</span>
+                                            {% elif log.status_anterior == 'pedido_enviado' %}
+                                                <span class="badge bg-primary">Pedido Enviado</span>
+                                            {% elif log.status_anterior == 'entregue' %}
+                                                <span class="badge bg-success">Entregue</span>
+                                            {% elif log.status_anterior == 'cancelado' %}
+                                                <span class="badge bg-danger">Cancelado</span>
+                                            {% else %}
+                                                {{ log.status_anterior }}
+                                            {% endif %}
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if log.status_novo %}
+                                            {% if log.status_novo == 'pendente' %}
+                                                <span class="badge bg-warning">Pendente</span>
+                                            {% elif log.status_novo == 'aprovado' %}
+                                                <span class="badge bg-info">Aprovado</span>
+                                            {% elif log.status_novo == 'pedido_enviado' %}
+                                                <span class="badge bg-primary">Pedido Enviado</span>
+                                            {% elif log.status_novo == 'entregue' %}
+                                                <span class="badge bg-success">Entregue</span>
+                                            {% elif log.status_novo == 'cancelado' %}
+                                                <span class="badge bg-danger">Cancelado</span>
+                                            {% else %}
+                                                {{ log.status_novo }}
+                                            {% endif %}
+                                        {% else %}
+                                            -
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ log.descricao|default:"-" }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle me-2"></i>
+                        Não há registros de histórico disponíveis para este pedido.
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Formulário oculto para atualização de status -->
+    <form id="formAtualizarStatus" method="post" action="{% url 'pedidos:atualizar_status' pedido.pk %}" style="display: none;">
+        {% csrf_token %}
+        <input type="hidden" name="novo_status" id="inputNovoStatus">
+    </form>
+
+    <!-- Modal de confirmação para excluir pedido -->
+    <div class="modal fade" id="modalExcluirPedido" tabindex="-1" aria-labelledby="modalExcluirPedidoLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalExcluirPedidoLabel">Confirmar Exclusão</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Tem certeza que deseja excluir o Pedido #{{ pedido.id }}?</p>
+                    <p class="text-danger"><strong>Atenção:</strong> Esta ação não pode ser desfeita. Todos os itens associados a este pedido também serão excluídos.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <a href="{% url 'pedidos:excluir' pedido.pk %}" class="btn btn-danger">Confirmar Exclusão</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de cancelamento de pedido -->
+    <div class="modal fade" id="modalCancelarPedido" tabindex="-1" aria-labelledby="modalCancelarPedidoLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalCancelarPedidoLabel">Justificativa de Cancelamento</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Por favor, forneça uma justificativa para o cancelamento do Pedido #{{ pedido.id }}:</p>
+                    <p class="text-danger"><strong>Atenção:</strong> Esta ação não pode ser desfeita.</p>
+                    <form id="formCancelarPedido">
+                        <div class="mb-3">
+                            <label for="justificativa_cancelamento" class="form-label">Justificativa <span class="text-danger">*</span></label>
+                            <textarea class="form-control" id="justificativa_cancelamento" name="justificativa_cancelamento" rows="3" required></textarea>
+                            <div class="invalid-feedback">
+                                Por favor, forneça uma justificativa para o cancelamento.
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-danger" id="btnConfirmarCancelamento">Confirmar Cancelamento</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de confirmação de entrega -->
+    <div class="modal fade" id="modalConfirmarEntrega" tabindex="-1" aria-labelledby="modalConfirmarEntregaLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalConfirmarEntregaLabel">Confirmar Entrega</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Para confirmar a entrega do Pedido #{{ pedido.id }}, preencha as informações abaixo:</p>
+                    <form id="formConfirmarEntrega">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="data_entrega" class="form-label">Data de Entrega <span class="text-danger">*</span></label>
+                                <input type="date" class="form-control" id="data_entrega" name="data_entrega" required 
+                                       max="{{ hoje_iso }}">
+                                <div class="invalid-feedback">
+                                    Por favor, informe a data de entrega.
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="hora_entrega" class="form-label">Hora de Entrega <span class="text-danger">*</span></label>
+                                <input type="time" class="form-control" id="hora_entrega" name="hora_entrega" required>
+                                <div class="invalid-feedback">
+                                    Por favor, informe a hora de entrega.
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="recebido_por" class="form-label">Recebido por <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="recebido_por" name="recebido_por" 
+                                   placeholder="Nome completo de quem recebeu" required maxlength="100">
+                            <div class="invalid-feedback">
+                                Por favor, informe quem recebeu o pedido.
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-success" id="btnConfirmarEntrega">Confirmar Entrega</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .table-details th {
+        background-color: #f8f9fa;
+    }
+    
+    /* Estilos específicos para impressão */
+    @media print {
+        @page {
+            margin: 15mm;
+            size: A4 portrait;
+        }
+        
+        body {
+            font-size: 12pt;
+            color: #000;
+            background-color: #fff;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            line-height: 1.4;
+        }
+        
+        .no-print {
+            display: none !important;
+        }
+        
+        .print-only {
+            display: block !important;
+        }
+        
+        /* Layout moderno para impressão */
+        .simple-print-form {
+            width: 100%;
+            margin: 0 auto;
+            padding: 0;
+        }
+        
+        /* Cabeçalho moderno */
+        .simple-header {
+            margin-bottom: 30px;
+            border-bottom: 2px solid #555;
+            padding-bottom: 15px;
+            position: relative;
+        }
+        
+        .header-title {
+            font-size: 24pt;
+            font-weight: 600;
+            text-align: center;
+            letter-spacing: -0.5px;
+            margin-bottom: 5px;
+        }
+        
+        .header-status {
+            text-align: center;
+            font-weight: 500;
+            margin-top: 8px;
+            font-size: 14pt;
+            letter-spacing: 1px;
+        }
+        
+        /* Seções modernas */
+        .simple-section {
+            margin-bottom: 25px;
+        }
+        
+        .section-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #aaa;
+            padding-bottom: 5px;
+            font-size: 14pt;
+            letter-spacing: 0.5px;
+        }
+        
+        /* Tabelas modernas */
+        .simple-info-table {
+            width: 100%;
+            margin-bottom: 25px;
+            border-collapse: collapse;
+        }
+        
+        .simple-info-table td {
+            padding: 8px 5px;
+            vertical-align: top;
+            line-height: 1.5;
+        }
+        
+        .simple-info-table strong {
+            font-weight: 600;
+            display: block;
+            margin-bottom: 3px;
+            letter-spacing: 0.5px;
+        }
+        
+        .simple-items-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 15px;
+        }
+        
+        .simple-items-table th, 
+        .simple-items-table td {
+            border: 1px solid #bbb;
+            padding: 10px 8px;
+        }
+        
+        .simple-items-table th {
+            background-color: #f5f5f5;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 11pt;
+            letter-spacing: 0.5px;
+        }
+        
+        .simple-items-table tr:nth-child(even) td {
+            background-color: #f9f9f9;
+        }
+        
+        .total-row {
+            background-color: #f5f5f5 !important;
+            font-weight: 600;
+        }
+        
+        /* Conteúdo moderno */
+        .simple-content {
+            margin-top: 10px;
+            line-height: 1.5;
+        }
+        
+        /* Assinaturas modernas */
+        .simple-signatures {
+            margin-top: 50px;
+            margin-bottom: 30px;
+        }
+        
+        .signature-line {
+            border-top: 1px solid #555;
+            width: 80%;
+            margin: 0 auto 5px auto;
+        }
+        
+        /* Rodapé moderno */
+        .simple-footer {
+            margin-top: 30px;
+            text-align: center;
+            border-top: 1px solid #aaa;
+            padding-top: 10px;
+            font-size: 9pt;
+            color: #555;
+        }
+        
+        /* Exibir e esconder conteúdo */
+        #print-layout {
+            display: none; /* Esconde normalmente */
+        }
+        
+        @media print {
+            #print-layout {
+                display: block; /* Mostra na impressão */
+            }
+            
+            .main-content {
+                display: none; /* Esconde o conteúdo normal na impressão */
+            }
+        }
+    }
+</style>
+
+<!-- Layout específico para impressão - normalmente invisível -->
+<div id="print-layout" class="print-only" style="display: none;">
+    <div class="simple-print-form">
+        <div class="simple-header">
+            <div class="header-title">PEDIDO #{{ pedido.id }}</div>
+            <div class="header-status">
+                {% if pedido.status == 'pendente' %}PENDENTE
+                {% elif pedido.status == 'aprovado' %}APROVADO
+                {% elif pedido.status == 'pedido_enviado' %}ENVIADO
+                {% elif pedido.status == 'entregue' %}ENTREGUE
+                {% elif pedido.status == 'cancelado' %}CANCELADO{% endif %}
+            </div>
+        </div>
+        
+        <div class="simple-section">
+            <table class="simple-info-table">
+                <tr>
+                    <td width="50%" valign="top">
+                        <strong>CONTRATO</strong>
+                        {{ pedido.escola.nome }}<br>
+                        {{ pedido.escola.endereco }}<br>
+                        {% if pedido.escola.cidade %}{{ pedido.escola.cidade }}{% endif %}
+                        {% if pedido.escola.estado %}/{{ pedido.escola.estado }}{% endif %}
+                        {% if pedido.escola.cep %} - CEP: {{ pedido.escola.cep }}{% endif %}<br>
+                        {% if pedido.escola.telefone %}Telefone: {{ pedido.escola.telefone }}<br>{% endif %}
+                        {% if pedido.escola.email %}Email: {{ pedido.escola.email }}<br>{% endif %}
+                        {% if pedido.escola.supervisor %}
+                        Supervisor: {{ pedido.escola.supervisor.nome }}
+                        {% endif %}
+                    </td>
+                    <td width="50%" valign="top">
+                        <strong>DATAS</strong>
+                        Solicitação: {{ pedido.data_solicitacao|date:"d/m/Y" }}<br>
+                        {% if pedido.data_aprovacao %}
+                        Aprovação: {{ pedido.data_aprovacao|date:"d/m/Y" }}<br>
+                        {% endif %}
+                        {% if pedido.data_envio %}
+                        Envio: {{ pedido.data_envio|date:"d/m/Y" }}<br>
+                        {% endif %}
+                        {% if pedido.data_entrega %}
+                        Entrega: {{ pedido.data_entrega|date:"d/m/Y" }}<br>
+                        {% endif %}
+                    </td>
+                </tr>
+            </table>
+        </div>
+        
+        <div class="simple-section">
+            <div class="section-title">ITENS DO PEDIDO</div>
+            <table class="simple-items-table">
+                <tr>
+                    <th>PRODUTO</th>
+                    <th width="12%">QTDE</th>
+                    <th width="20%">VALOR UNIT.</th>
+                    <th width="20%">TOTAL</th>
+                </tr>
+                {% for item in pedido.itens.all %}
+                <tr>
+                    <td>{{ item.produto.nome }}</td>
+                    <td align="center">{{ item.quantidade }}</td>
+                    <td align="right">R$ {{ item.valor_unitario }}</td>
+                    <td align="right">R$ {{ item.valor_total }}</td>
+                </tr>
+                {% endfor %}
+                <tr class="total-row">
+                    <td colspan="3" align="right"><strong>VALOR TOTAL:</strong></td>
+                    <td align="right"><strong>R$ {{ pedido.valor_total }}</strong></td>
+                </tr>
+            </table>
+        </div>
+        
+        {% if pedido.observacoes %}
+        <div class="simple-section">
+            <div class="section-title">OBSERVAÇÕES</div>
+            <div class="simple-content">
+                {{ pedido.observacoes|linebreaks }}
+            </div>
+        </div>
+        {% endif %}
+        
+        {% if pedido.status == 'cancelado' and pedido.justificativa_cancelamento %}
+        <div class="simple-section">
+            <div class="section-title">JUSTIFICATIVA DE CANCELAMENTO</div>
+            <div class="simple-content">
+                {{ pedido.justificativa_cancelamento|linebreaks }}
+            </div>
+        </div>
+        {% endif %}
+        
+        <div class="simple-signatures">
+            <table width="100%">
+                <tr>
+                    <td width="45%" align="center">
+                        <div class="signature-line"></div>
+                        <small>Responsável pela Emissão</small>
+                    </td>
+                    <td width="10%">&nbsp;</td>
+                    <td width="45%" align="center">
+                        <div class="signature-line"></div>
+                        <small>Responsável pelo Recebimento</small>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        
+        <div class="simple-footer">
+            Documento gerado em: {% now "d/m/Y H:i:s" %} | Sistema de Gestão de Pedidos
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log("Página de detalhes do pedido carregada");
+        
+        // Função para impressão com o layout específico
+        window.printPedido = function() {
+            window.print();
+        };
+        
+        // Atualização de status
+        const botoesStatus = document.querySelectorAll('.btn-atualizar-status');
+        botoesStatus.forEach(function(botao) {
+            botao.addEventListener('click', function(e) {
+                e.preventDefault();
+                console.log("Botão de atualizar status clicado");
+                
+                const novoStatus = this.getAttribute('data-status');
+                console.log("Novo status:", novoStatus);
+                
+                // Para cancelamento, exibir o modal de justificativa
+                if (novoStatus === 'cancelado') {
+                    // Limpar qualquer valor anterior no campo de justificativa
+                    document.getElementById('justificativa_cancelamento').value = '';
+                    
+                    // Exibir o modal de cancelamento
+                    const modalCancelarPedido = new bootstrap.Modal(document.getElementById('modalCancelarPedido'));
+                    modalCancelarPedido.show();
+                    
+                    // Não prosseguir com o restante do código
+                    return;
+                }
+                
+                // Para entrega, exibir o modal de confirmação de entrega
+                if (novoStatus === 'entregue') {
+                    // Definir a data atual no campo de data
+                    const hoje = new Date();
+                    const dataFormatada = hoje.toISOString().split('T')[0]; // Formato YYYY-MM-DD
+                    document.getElementById('data_entrega').value = dataFormatada;
+                    
+                    // Definir a hora atual no campo de hora
+                    const horaAtual = ('0' + hoje.getHours()).slice(-2) + ':' + ('0' + hoje.getMinutes()).slice(-2);
+                    document.getElementById('hora_entrega').value = horaAtual;
+                    
+                    // Limpar o campo de recebido por
+                    document.getElementById('recebido_por').value = '';
+                    
+                    // Exibir o modal de confirmação de entrega
+                    const modalConfirmarEntrega = new bootstrap.Modal(document.getElementById('modalConfirmarEntrega'));
+                    modalConfirmarEntrega.show();
+                    
+                    // Não prosseguir com o restante do código
+                    return;
+                }
+                
+                // Define a mensagem com base no status (para outros status que não seja cancelamento ou entrega)
+                let mensagem = '';
+                if (novoStatus === 'aprovado') {
+                    mensagem = 'Deseja aprovar este pedido? Após aprovação, apenas administradores poderão alterá-lo.';
+                } else if (novoStatus === 'pedido_enviado') {
+                    mensagem = 'Deseja marcar este pedido como enviado?';
+                }
+                
+                // Usar confirmation nativo do navegador para todos os outros casos
+                if (confirm(mensagem)) {
+                    // Definir o valor do input e enviar o formulário
+                    document.getElementById('inputNovoStatus').value = novoStatus;
+                    document.getElementById('formAtualizarStatus').submit();
+                }
+            });
+        });
+        
+        // Lidar com o botão de confirmar cancelamento no modal
+        document.getElementById('btnConfirmarCancelamento').addEventListener('click', function() {
+            const justificativa = document.getElementById('justificativa_cancelamento').value.trim();
+            
+            if (!justificativa) {
+                // Marcar o campo como inválido
+                document.getElementById('justificativa_cancelamento').classList.add('is-invalid');
+                return;
+            }
+            
+            // Remover classe de inválido se presente
+            document.getElementById('justificativa_cancelamento').classList.remove('is-invalid');
+            
+            // Preparar o formulário para envio
+            document.getElementById('inputNovoStatus').value = 'cancelado';
+            
+            // Criar um input hidden dinâmico para a justificativa
+            const inputJustificativa = document.createElement('input');
+            inputJustificativa.type = 'hidden';
+            inputJustificativa.name = 'justificativa_cancelamento';
+            inputJustificativa.value = justificativa;
+            
+            // Adicionar o input ao formulário
+            document.getElementById('formAtualizarStatus').appendChild(inputJustificativa);
+            
+            // Enviar o formulário
+            document.getElementById('formAtualizarStatus').submit();
+        });
+        
+        // Lidar com o botão de confirmar entrega no modal
+        document.getElementById('btnConfirmarEntrega').addEventListener('click', function() {
+            // Validar os campos
+            const dataEntrega = document.getElementById('data_entrega').value.trim();
+            const horaEntrega = document.getElementById('hora_entrega').value.trim();
+            const recebidoPor = document.getElementById('recebido_por').value.trim();
+            
+            let formValido = true;
+            
+            // Verificar cada campo e marcar como inválido se necessário
+            if (!dataEntrega) {
+                document.getElementById('data_entrega').classList.add('is-invalid');
+                formValido = false;
+            } else {
+                document.getElementById('data_entrega').classList.remove('is-invalid');
+            }
+            
+            if (!horaEntrega) {
+                document.getElementById('hora_entrega').classList.add('is-invalid');
+                formValido = false;
+            } else {
+                document.getElementById('hora_entrega').classList.remove('is-invalid');
+            }
+            
+            if (!recebidoPor) {
+                document.getElementById('recebido_por').classList.add('is-invalid');
+                formValido = false;
+            } else {
+                document.getElementById('recebido_por').classList.remove('is-invalid');
+            }
+            
+            if (!formValido) {
+                return;
+            }
+            
+            // Preparar o formulário para envio
+            document.getElementById('inputNovoStatus').value = 'entregue';
+            
+            // Criar inputs hidden dinâmicos para os dados de entrega
+            const inputDataEntrega = document.createElement('input');
+            inputDataEntrega.type = 'hidden';
+            inputDataEntrega.name = 'data_entrega';
+            inputDataEntrega.value = dataEntrega;
+            
+            const inputHoraEntrega = document.createElement('input');
+            inputHoraEntrega.type = 'hidden';
+            inputHoraEntrega.name = 'hora_entrega';
+            inputHoraEntrega.value = horaEntrega;
+            
+            const inputRecebidoPor = document.createElement('input');
+            inputRecebidoPor.type = 'hidden';
+            inputRecebidoPor.name = 'recebido_por';
+            inputRecebidoPor.value = recebidoPor;
+            
+            // Adicionar os inputs ao formulário
+            const form = document.getElementById('formAtualizarStatus');
+            form.appendChild(inputDataEntrega);
+            form.appendChild(inputHoraEntrega);
+            form.appendChild(inputRecebidoPor);
+            
+            // Enviar o formulário
+            form.submit();
+        });
+        
+        // Verificar se há erros na URL para exibir o alerta
+        if (window.location.search.includes('erro=status')) {
+            alert("Houve um erro ao atualizar o status do pedido. Por favor, tente novamente.");
+        }
+        
+        // Remover o aviso de campo inválido quando o usuário começar a digitar
+        document.getElementById('justificativa_cancelamento').addEventListener('input', function() {
+            this.classList.remove('is-invalid');
+        });
+    });
+</script>
+{% endblock %} 

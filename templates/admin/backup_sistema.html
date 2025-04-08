@@ -1,0 +1,140 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static %}
+
+{% block title %}Backup do Sistema | {{ site_title|default:_('Django site admin') }}{% endblock %}
+
+{% block extrastyle %}
+  {{ block.super }}
+  <style>
+    .backup-container {
+      max-width: 800px;
+      margin: 20px auto;
+      padding: 20px;
+      background-color: #fff;
+      border-radius: 5px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+    }
+    
+    .backup-container h1 {
+      margin-top: 0;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 10px;
+      color: #417690;
+    }
+    
+    .backup-info {
+      background-color: #f8f9fa;
+      border-left: 4px solid #79aec8;
+      padding: 15px;
+      margin-bottom: 20px;
+    }
+    
+    .backup-warning {
+      background-color: #fff3cd;
+      border-left: 4px solid #ffc107;
+      padding: 15px;
+      margin-bottom: 20px;
+    }
+    
+    .backup-error {
+      background-color: #f8d7da;
+      border-left: 4px solid #dc3545;
+      padding: 15px;
+      margin-bottom: 20px;
+    }
+    
+    .backup-tips {
+      background-color: #d1e7dd;
+      border-left: 4px solid #198754;
+      padding: 15px;
+      margin-top: 20px;
+    }
+    
+    .backup-btn {
+      background-color: #417690;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      cursor: pointer;
+      border-radius: 4px;
+      font-weight: bold;
+      transition: background-color 0.3s;
+    }
+    
+    .backup-btn:hover {
+      background-color: #2d5066;
+    }
+  </style>
+{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+  <a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+  &rsaquo; {% trans 'Backup do Sistema' %}
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="backup-container">
+  <h1>Backup do Sistema</h1>
+  
+  {% if messages %}
+  <div class="backup-error">
+    <p><strong>Ocorreram erros durante o processo:</strong></p>
+    <ul>
+      {% for message in messages %}
+        <li>{{ message }}</li>
+      {% endfor %}
+    </ul>
+    
+    <div class="backup-tips">
+      <p><strong>Sugestões para resolver o problema:</strong></p>
+      
+      {% if 'WinError 32' in messages.0.message %}
+      <p><strong>Erro específico detectado:</strong> O arquivo está sendo usado por outro processo (WinError 32)</p>
+      <ol>
+        <li>Reinicie o servidor web completamente (não apenas o Django, mas o serviço do IIS/Apache/etc. se aplicável)</li>
+        <li>Se estiver executando no modo de desenvolvimento, feche todos os shells de comando e reinicie o servidor</li>
+        <li>Verifique se há outras aplicações que possam estar acessando o banco de dados SQLite</li>
+        <li>Feche qualquer ferramenta de administração de banco de dados que possa estar aberta (como DB Browser for SQLite)</li>
+        <li>Se o problema persistir, tente o backup após reiniciar o computador</li>
+      </ol>
+      <p><strong>Alternativa manual:</strong> Se ainda não conseguir realizar o backup pelo sistema, você pode:</p>
+      <ol>
+        <li>Fechar completamente a aplicação</li>
+        <li>Copiar manualmente o arquivo do banco de dados <code>{{ database_path }}</code></li>
+        <li>Fazer uma cópia da pasta de mídia (geralmente localizada em <code>media/</code> na raiz do projeto)</li>
+      </ol>
+      {% else %}
+      <ul>
+        <li>Feche qualquer aplicativo que possa estar acessando o banco de dados</li>
+        <li>Verifique se o servidor tem permissões para acessar e modificar os arquivos temporários</li>
+        <li>Se o erro persistir, tente reiniciar o servidor web e tentar novamente</li>
+        <li>Em último caso, use uma ferramenta de backup externa para o banco de dados SQLite</li>
+      </ul>
+      {% endif %}
+    </div>
+  </div>
+  {% endif %}
+  
+  <div class="backup-info">
+    <p><strong>Informações importantes:</strong></p>
+    <ul>
+      <li>O backup criará um arquivo compactado contendo o banco de dados completo e todos os arquivos de mídia.</li>
+      <li>Você poderá usar esse arquivo para restaurar o sistema em caso de problemas.</li>
+      <li>Recomendamos fazer backups regularmente para garantir a segurança dos dados.</li>
+    </ul>
+  </div>
+  
+  <div class="backup-warning">
+    <p><strong>Atenção:</strong></p>
+    <p>O processo de backup pode levar alguns minutos, dependendo do tamanho do banco de dados e da quantidade de arquivos de mídia.</p>
+    <p>Não feche esta janela até que o download do arquivo de backup seja iniciado.</p>
+  </div>
+  
+  <form method="post" action="{% url 'admin:backup_sistema' %}">
+    {% csrf_token %}
+    <button type="submit" class="backup-btn">Iniciar Backup</button>
+  </form>
+</div>
+{% endblock %} 

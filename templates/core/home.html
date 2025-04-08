@@ -1,0 +1,314 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Início - Sistema de Pedidos{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2><i class="bi bi-speedometer2 me-2"></i>Dashboard</h2>
+    <a href="{% url 'pedidos:novo' %}" class="btn btn-primary btn-lg rounded-pill shadow-sm">
+        <i class="bi bi-plus-circle me-1"></i> Novo Pedido
+    </a>
+</div>
+
+<div class="row">
+    <div class="col-md-3 mb-4">
+        <div class="card h-100 dashboard-card shadow-sm border-0 rounded-lg transition-card">
+            <div class="card-body">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <h5 class="card-title mb-0 fw-bold">Total de Produtos</h5>
+                    <div class="icon-circle bg-primary-subtle">
+                        <i class="bi bi-box fs-1 text-primary"></i>
+                    </div>
+                </div>
+                <h2 class="mb-0 fw-bold">{{ total_produtos }}</h2>
+                <p class="text-muted">Produtos cadastrados</p>
+                <a href="{% url 'produtos:lista' %}" class="btn btn-sm btn-primary rounded-pill mt-2">Ver Detalhes <i class="bi bi-arrow-right ms-1"></i></a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 mb-4">
+        <div class="card h-100 dashboard-card info shadow-sm border-0 rounded-lg transition-card">
+            <div class="card-body">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <h5 class="card-title mb-0 fw-bold">Total de Contratos</h5>
+                    <div class="icon-circle bg-info-subtle">
+                        <i class="bi bi-building fs-1 text-info"></i>
+                    </div>
+                </div>
+                <h2 class="mb-0 fw-bold">{{ total_escolas }}</h2>
+                <p class="text-muted">Contratos cadastrados</p>
+                <a href="{% url 'escolas:lista' %}" class="btn btn-sm btn-info rounded-pill mt-2 text-white">Ver Detalhes <i class="bi bi-arrow-right ms-1"></i></a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 mb-4">
+        <div class="card h-100 dashboard-card success shadow-sm border-0 rounded-lg transition-card">
+            <div class="card-body">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <h5 class="card-title mb-0 fw-bold">Pedidos Ativos</h5>
+                    <div class="icon-circle bg-success-subtle">
+                        <i class="bi bi-cart-check fs-1 text-success"></i>
+                    </div>
+                </div>
+                <h2 class="mb-0 fw-bold">{{ total_pedidos_ativos }}</h2>
+                <p class="text-muted">Pedidos em andamento</p>
+                <a href="{% url 'pedidos:lista' %}" class="btn btn-sm btn-success rounded-pill mt-2">Ver Detalhes <i class="bi bi-arrow-right ms-1"></i></a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 mb-4">
+        <div class="card h-100 dashboard-card danger shadow-sm border-0 rounded-lg transition-card">
+            <div class="card-body">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <h5 class="card-title mb-0 fw-bold">Pedidos Pendentes</h5>
+                    <div class="icon-circle bg-danger-subtle">
+                        <i class="bi bi-hourglass-split fs-1 text-danger"></i>
+                    </div>
+                </div>
+                <h2 class="mb-0 fw-bold">{{ total_pedidos_pendentes }}</h2>
+                <p class="text-muted">Pedidos aguardando</p>
+                <a href="{% url 'pedidos:lista' %}?status=pendente" class="btn btn-sm btn-danger rounded-pill mt-2">Ver Detalhes <i class="bi bi-arrow-right ms-1"></i></a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-8 mb-4">
+        <div class="card shadow-sm border-0 rounded-lg">
+            <div class="card-header bg-white border-0">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0 fw-bold"><i class="bi bi-list-check me-2 text-primary"></i>Pedidos Recentes</h5>
+                    <a href="{% url 'pedidos:lista' %}" class="btn btn-sm btn-primary rounded-pill">Ver Todos <i class="bi bi-arrow-right ms-1"></i></a>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0 custom-table">
+                        <thead class="table-light">
+                            <tr>
+                                <th>ID</th>
+                                <th>Contrato</th>
+                                <th>Empresa</th>
+                                <th>Data</th>
+                                <th>Status</th>
+                                <th>Valor Total</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for pedido in pedidos_recentes %}
+                            <tr class="align-middle">
+                                <td>#{{ pedido.id }}</td>
+                                <td>{{ pedido.escola.nome }}</td>
+                                <td>{{ pedido.escola.empresa|default:"-" }}</td>
+                                <td>{{ pedido.data_solicitacao|date:"d/m/Y H:i" }}</td>
+                                <td>
+                                    {% if pedido.status == 'pendente' %}
+                                    <span class="badge rounded-pill bg-warning text-dark">Pendente</span>
+                                    {% elif pedido.status == 'aprovado' %}
+                                    <span class="badge rounded-pill bg-success">Aprovado</span>
+                                    {% elif pedido.status == 'pedido_enviado' %}
+                                    <span class="badge rounded-pill bg-primary">Pedido Enviado</span>
+                                    {% elif pedido.status == 'entregue' %}
+                                    <span class="badge rounded-pill bg-info">Entregue</span>
+                                    {% elif pedido.status == 'cancelado' %}
+                                    <span class="badge rounded-pill bg-danger">Cancelado</span>
+                                    {% endif %}
+                                </td>
+                                <td>R$ {{ pedido.valor_total|floatformat:2 }}</td>
+                                <td>
+                                    <a href="{% url 'pedidos:detalhes' pedido.id %}" class="btn btn-sm btn-outline-primary rounded-circle" 
+                                       data-bs-toggle="tooltip" title="Ver Detalhes">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="7" class="text-center py-4">
+                                    <i class="bi bi-emoji-neutral fs-1 text-muted mb-2"></i>
+                                    <p class="mb-0 text-muted">Nenhum pedido registrado ainda.</p>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4 mb-4">
+        <div class="card h-100 shadow-sm border-0 rounded-lg">
+            <div class="card-header bg-white border-0">
+                <h5 class="mb-0 fw-bold"><i class="bi bi-building me-2 text-info"></i>Contratos com Mais Pedidos</h5>
+            </div>
+            <div class="card-body">
+                {% for escola in escolas_top %}
+                <div class="d-flex justify-content-between align-items-center mb-3 p-3 border rounded escola-item transition-item">
+                    <div>
+                        <h6 class="mb-0 fw-bold">{{ escola.nome }}</h6>
+                        {% if escola.empresa %}
+                        <small class="text-muted"><i class="bi bi-building me-1"></i>{{ escola.empresa }}</small><br>
+                        {% endif %}
+                        <small class="badge bg-info-subtle text-info rounded-pill mt-1"><i class="bi bi-cart3 me-1"></i>{{ escola.total_pedidos }} pedidos</small>
+                    </div>
+                    <a href="{% url 'escolas:detalhes' escola.id %}" class="btn btn-sm btn-outline-info rounded-circle action-btn">
+                        <i class="bi bi-eye"></i>
+                    </a>
+                </div>
+                {% empty %}
+                <div class="text-center text-muted my-5">
+                    <i class="bi bi-building-slash fs-1 mb-3"></i>
+                    <p>Nenhum contrato com pedidos ainda.</p>
+                </div>
+                {% endfor %}
+            </div>
+            <div class="card-footer bg-white text-center border-0 pt-0">
+                <a href="{% url 'escolas:lista' %}" class="btn btn-info text-white rounded-pill">
+                    <i class="bi bi-building me-1"></i> Ver Todos os Contratos
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-2">
+    <div class="col-12">
+        <div class="card shadow-sm border-0 rounded-lg">
+            <div class="card-header bg-white border-0">
+                <h5 class="mb-0 fw-bold"><i class="bi bi-lightning-charge me-2 text-warning"></i>Ações Rápidas</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3 mb-3">
+                        <a href="{% url 'produtos:importar' %}" class="card h-100 text-decoration-none text-dark border-0 shadow-sm action-card">
+                            <div class="card-body text-center p-4">
+                                <div class="icon-lg bg-success-subtle rounded-circle mb-3 mx-auto">
+                                    <i class="bi bi-file-earmark-excel fs-1 text-success"></i>
+                                </div>
+                                <h5 class="fw-bold">Importar Produtos</h5>
+                                <p class="text-muted">Importar produtos via Excel</p>
+                                <span class="btn btn-sm btn-success rounded-pill mt-2">Iniciar <i class="bi bi-arrow-right ms-1"></i></span>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <a href="{% url 'escolas:importar' %}" class="card h-100 text-decoration-none text-dark border-0 shadow-sm action-card">
+                            <div class="card-body text-center p-4">
+                                <div class="icon-lg bg-success-subtle rounded-circle mb-3 mx-auto">
+                                    <i class="bi bi-file-earmark-excel fs-1 text-success"></i>
+                                </div>
+                                <h5 class="fw-bold">Importar Contratos</h5>
+                                <p class="text-muted">Importar contratos via Excel</p>
+                                <span class="btn btn-sm btn-success rounded-pill mt-2">Iniciar <i class="bi bi-arrow-right ms-1"></i></span>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <a href="{% url 'pedidos:exportar' %}" class="card h-100 text-decoration-none text-dark border-0 shadow-sm action-card">
+                            <div class="card-body text-center p-4">
+                                <div class="icon-lg bg-primary-subtle rounded-circle mb-3 mx-auto">
+                                    <i class="bi bi-file-earmark-excel fs-1 text-primary"></i>
+                                </div>
+                                <h5 class="fw-bold">Exportar Pedidos</h5>
+                                <p class="text-muted">Exportar pedidos para Excel</p>
+                                <span class="btn btn-sm btn-primary rounded-pill mt-2">Iniciar <i class="bi bi-arrow-right ms-1"></i></span>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <a href="{% url 'pedidos:relatorio' %}" class="card h-100 text-decoration-none text-dark border-0 shadow-sm action-card">
+                            <div class="card-body text-center p-4">
+                                <div class="icon-lg bg-danger-subtle rounded-circle mb-3 mx-auto">
+                                    <i class="bi bi-file-earmark-pdf fs-1 text-danger"></i>
+                                </div>
+                                <h5 class="fw-bold">Gerar Relatório</h5>
+                                <p class="text-muted">Relatórios de pedidos</p>
+                                <span class="btn btn-sm btn-danger rounded-pill mt-2">Iniciar <i class="bi bi-arrow-right ms-1"></i></span>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* Estilos para os cards e elementos */
+.transition-card {
+    transition: all 0.3s ease;
+}
+
+.transition-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+}
+
+.icon-circle {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.icon-lg {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+}
+
+.escola-item {
+    transition: all 0.3s ease;
+}
+
+.escola-item:hover {
+    background-color: rgba(0,0,0,0.02);
+    transform: translateX(5px);
+}
+
+.action-btn {
+    opacity: 0.7;
+    transition: all 0.3s ease;
+}
+
+.escola-item:hover .action-btn {
+    opacity: 1;
+}
+
+.action-card {
+    transition: all 0.3s ease;
+    border-radius: 12px;
+}
+
+.action-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+}
+
+.custom-table tr {
+    transition: all 0.2s ease;
+}
+
+.custom-table tr:hover {
+    background-color: rgba(0,0,0,0.02);
+}
+
+.page-header {
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+}
+</style>
+{% endblock %} 

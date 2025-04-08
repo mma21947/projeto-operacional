@@ -1,0 +1,2668 @@
+{% extends "core/base.html" %}
+{% load static dashboard_extras dashboard_tags math_filters %}
+
+{% block extra_head %}
+<!-- Biblioteca Leaflet para mapas -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" 
+      integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A==" 
+      crossorigin="" />
+<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js" 
+      integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA==" 
+      crossorigin=""></script>
+
+<!-- ApexCharts para gráficos avançados -->
+<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+
+<style>
+    :root {
+        /* Paleta de cores principal */
+        --primary: #4361ee;
+        --primary-light: #4895ef;
+        --primary-dark: #3a0ca3;
+        --secondary: #f72585;
+        --secondary-light: #ff66b2;
+        --success: #4cc9f0;
+        --warning: #ffd166;
+        --danger: #ef476f;
+        --info: #4895ef;
+        
+        /* Cores neutras */
+        --white: #ffffff;
+        --light: #f8f9fa;
+        --light-gray: #e9ecef;
+        --gray: #6c757d;
+        --dark-gray: #343a40;
+        --dark: #212529;
+        
+        /* Gradientes */
+        --gradient-primary: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+        --gradient-secondary: linear-gradient(135deg, var(--secondary) 0%, var(--secondary-light) 100%);
+        --gradient-success: linear-gradient(135deg, #0cce6b 0%, #06e775 100%);
+        --gradient-danger: linear-gradient(135deg, #ff4646 0%, #f72585 100%);
+        --gradient-warning: linear-gradient(135deg, #ffd166 0%, #ffaa00 100%);
+        --gradient-info: linear-gradient(135deg, #3a86ff 0%, #4cc9f0 100%);
+        --gradient-dark: linear-gradient(135deg, #161a1d 0%, #0b090a 100%);
+        
+        /* Cores de fundo */
+        --bg-color: #f8f9fa;
+        --card-bg: #ffffff;
+        --card-bg-dark: #232730;
+        
+        /* Sombras */
+        --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        --card-shadow-hover: 0 8px 25px rgba(0, 0, 0, 0.15);
+        --button-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+        
+        /* Cores para métricas */
+        --pending-color: #ffc145;
+        --approved-color: #4361ee;
+        --shipped-color: #3a86ff;
+        --delivered-color: #4cc9f0;
+        --canceled-color: #ef476f;
+        --contracts-color: #06d6a0;
+    }
+
+    body {
+        background-image: 
+            radial-gradient(circle at 20% 20%, rgba(76, 0, 255, 0.1) 0%, rgba(76, 0, 255, 0.03) 70%),
+            radial-gradient(circle at 80% 80%, rgba(94, 221, 230, 0.1) 0%, rgba(94, 221, 230, 0.03) 70%);
+        background-color: #f8faff;
+        color: var(--dark);
+        font-family: 'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        margin: 0;
+        padding: 0;
+        line-height: 1.5;
+        position: relative;
+        overflow-x: hidden;
+        min-height: 100vh;
+    }
+    
+    /* Elementos de fundo animados */
+    .bg-shapes {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+        overflow: hidden;
+        pointer-events: none;
+    }
+
+    .shape {
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(40px);
+        opacity: 0.4;
+    }
+
+    .shape-1 {
+        width: 500px;
+        height: 500px;
+        top: -250px;
+        left: -200px;
+        background: linear-gradient(135deg, #e661ff, #7517f5);
+        animation: floatAnimation 20s ease-in-out infinite alternate;
+    }
+
+    .shape-2 {
+        width: 400px;
+        height: 400px;
+        bottom: -150px;
+        right: -150px;
+        background: linear-gradient(135deg, #5edfff, #3c96ff);
+        animation: floatAnimation 15s ease-in-out infinite alternate-reverse;
+    }
+
+    .shape-3 {
+        width: 300px;
+        height: 300px;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: linear-gradient(135deg, #fcff6c, #ff9c37);
+        opacity: 0.2;
+        animation: pulseAnimation 10s ease-in-out infinite;
+    }
+
+    @keyframes floatAnimation {
+        0% {
+            transform: translate(0, 0) rotate(0deg);
+        }
+        100% {
+            transform: translate(30px, 50px) rotate(15deg);
+        }
+    }
+
+    @keyframes pulseAnimation {
+        0%, 100% {
+            transform: translate(-50%, -50%) scale(0.8);
+            opacity: 0.2;
+        }
+        50% {
+            transform: translate(-50%, -50%) scale(1.1);
+            opacity: 0.3;
+        }
+    }
+
+    /* Estilos para o dashboard */
+    .dashboard-container {
+        padding: 20px;
+        max-width: 1800px;
+        margin: 0 auto;
+        position: relative;
+        z-index: 1;
+    }
+    
+    .dashboard-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 25px;
+        padding: 12px 20px;
+        background: white;
+        position: relative;
+        overflow: hidden;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        border: none;
+    }
+
+    .dashboard-header::before {
+        display: none;
+    }
+
+    .dashboard-logo {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        min-width: 180px;
+        z-index: 2;
+    }
+
+    .logo-image {
+        width: 35px;
+        height: 35px;
+        object-fit: contain;
+    }
+    
+    .dashboard-title-section {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        gap: 10px;
+        position: absolute;
+        width: 100%;
+        left: 0;
+        right: 0;
+        pointer-events: none;
+        z-index: 1;
+    }
+    
+    .dashboard-icon {
+        width: 1.4rem;  /* Tamanho proporcional à fonte */
+        height: 1.4rem; /* Tamanho proporcional à fonte */
+        border-radius: 50%;
+        background: #6e19ff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 0.8rem; /* Ajustando tamanho do ícone interno */
+        box-shadow: 0 3px 10px rgba(93, 18, 246, 0.4);
+        pointer-events: auto;
+        animation: pulse-effect 2s infinite;
+        margin-right: 10px;
+    }
+
+    @keyframes pulse-effect {
+        0% {
+            box-shadow: 0 0 0 0 rgba(110, 25, 255, 0.7);
+            transform: scale(1);
+        }
+        50% {
+            box-shadow: 0 0 0 8px rgba(110, 25, 255, 0);
+            transform: scale(1.05);
+        }
+        100% {
+            box-shadow: 0 0 0 0 rgba(110, 25, 255, 0);
+            transform: scale(1);
+        }
+    }
+    
+    .dashboard-title {
+        margin: 0;
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #333;
+        text-align: center;
+        pointer-events: auto;
+    }
+
+    .dashboard-subtitle {
+        margin: 3px 0 0;
+        font-size: 0.85rem;
+        color: #666;
+        font-weight: 400;
+        text-align: center;
+    }
+
+    /* KPI Cards */
+    .kpi-row {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+        margin-bottom: 25px;
+    }
+
+    .kpi-card {
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border-radius: 15px;
+        padding: 20px;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        transition: all 0.3s ease;
+        overflow: hidden;
+        position: relative;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+    
+    .kpi-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+    }
+
+    /* Efeito 3D para os cards */
+    .card-3d {
+        perspective: 1000px;
+        transform-style: preserve-3d;
+    }
+
+    .card-3d-inner {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+        transition: transform 0.6s;
+        transform-style: preserve-3d;
+    }
+
+    .card-3d:hover .card-3d-inner {
+        transform: rotateY(10deg);
+    }
+
+    .kpi-info {
+        z-index: 2;
+    }
+
+    .kpi-label {
+        font-size: 0.9rem;
+        color: var(--gray);
+        margin-bottom: 5px;
+        font-weight: 500;
+    }
+
+    .kpi-value {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: var(--dark);
+        margin-bottom: 10px;
+    }
+
+    .kpi-trend {
+        font-size: 0.8rem;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+    
+    .trend-up {
+        color: #4cc9f0;
+    }
+
+    .trend-down {
+        color: #ef476f;
+    }
+
+    .kpi-icon {
+        width: 55px;
+        height: 55px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.4rem;
+        z-index: 1;
+    }
+
+    .kpi-revenue {
+        background: var(--gradient-primary);
+    }
+
+    .kpi-orders {
+        background: var(--gradient-info);
+    }
+
+    .kpi-avg {
+        background: var(--gradient-success);
+    }
+
+    .kpi-rate {
+        background: var(--gradient-secondary);
+    }
+
+    /* Barra de filtros */
+    .filter-section {
+        background: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border-radius: 16px;
+        padding: 20px;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        margin-bottom: 25px;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: flex-start;
+        gap: 20px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .filter-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: var(--dark);
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .filter-title i {
+        color: var(--primary);
+        font-size: 1.2rem;
+    }
+
+    .filter-group {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: flex-start;
+        gap: 15px;
+        flex-grow: 1;
+    }
+
+    .filter-item {
+        flex: 1;
+        min-width: 180px;
+    }
+
+    .filter-label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 500;
+        font-size: 0.9rem;
+        color: var(--dark-gray);
+    }
+
+    .filter-select, .filter-input {
+        width: 100%;
+        padding: 12px 15px;
+        border: 1px solid rgba(233, 236, 239, 0.6);
+        border-radius: 12px;
+        background-color: rgba(255, 255, 255, 0.7);
+        backdrop-filter: blur(5px);
+        -webkit-backdrop-filter: blur(5px);
+        font-size: 0.95rem;
+        transition: all 0.3s ease;
+        color: var(--dark);
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    }
+    
+    .filter-select:focus, .filter-input:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.15);
+        background-color: rgba(255, 255, 255, 0.9);
+    }
+
+    .filter-actions {
+        display: flex;
+        gap: 10px;
+        align-items: flex-end;
+        margin-top: auto;
+    }
+
+    .filter-btn {
+        padding: 12px 20px;
+        border: none;
+        border-radius: 12px;
+        font-weight: 500;
+        font-size: 0.95rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.3s ease;
+        background: linear-gradient(135deg, #4303f0, #7517f5);
+        color: white;
+        box-shadow: 0 5px 15px rgba(67, 3, 240, 0.25);
+    }
+    
+    .filter-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(67, 3, 240, 0.35);
+    }
+    
+    .filter-btn i {
+        font-size: 1rem;
+    }
+
+    .filter-btn-outline {
+        background: transparent;
+        border: 1px solid rgba(67, 3, 240, 0.3);
+        color: #4303f0;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+    }
+    
+    .filter-btn-outline:hover {
+        background: rgba(67, 3, 240, 0.05);
+        border-color: rgba(67, 3, 240, 0.5);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+    }
+
+    /* Media Queries para responsividade dos filtros */
+    @media (max-width: 992px) {
+        .filter-section {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        
+        .filter-group {
+            width: 100%;
+        }
+        
+        .filter-actions {
+            width: 100%;
+            justify-content: space-between;
+        }
+        
+        .dashboard-header {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .filter-item {
+            min-width: 100%;
+            width: 100%;
+        }
+        
+        .filter-actions {
+            flex-wrap: wrap;
+            justify-content: stretch;
+            gap: 8px;
+        }
+        
+        .filter-btn {
+            flex: 1;
+            min-width: 120px;
+            justify-content: center;
+        }
+    }
+
+    /* Grid de cards de métricas principais */
+    .metrics-overview {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+        margin-bottom: 25px;
+    }
+
+    .metric-card {
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border-radius: 16px;
+        padding: 20px;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+        position: relative;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    
+    .metric-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.18);
+    }
+
+    .metric-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 15px;
+    }
+
+    .metric-title {
+        margin: 0;
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--dark);
+    }
+
+    .metric-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.2rem;
+    }
+    
+    .metric-value {
+        font-size: 1.6rem;
+        font-weight: 700;
+        color: var(--dark);
+        margin-bottom: 10px;
+    }
+
+    .metric-trend {
+        font-size: 0.8rem;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        margin-bottom: 15px;
+    }
+
+    .metric-progress {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        height: 5px;
+        background: var(--primary-light);
+        border-radius: 0 2.5px 2.5px 0;
+    }
+
+    /* Ícones das métricas */
+    .metric-icon-pending {
+        background: var(--gradient-warning);
+    }
+
+    .metric-icon-approved {
+        background: var(--gradient-primary);
+    }
+
+    .metric-icon-shipped {
+        background: var(--gradient-info);
+    }
+
+    .metric-icon-delivered {
+        background: var(--gradient-success);
+    }
+
+    .metric-icon-canceled {
+        background: var(--gradient-danger);
+    }
+
+    .metric-icon-contracts {
+        background: linear-gradient(135deg, #0cce6b 0%, #06d6a0 100%);
+    }
+
+    .metric-icon-warning {
+        background: var(--gradient-warning);
+    }
+
+    /* Grid principal do dashboard */
+    .dashboard-grid {
+        display: grid;
+        grid-template-columns: repeat(12, 1fr);
+        gap: 20px;
+    }
+
+    .dashboard-card {
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border-radius: 20px;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+        overflow: hidden;
+        transition: all 0.3s ease;
+        height: 100%;
+        position: relative;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    
+    .dashboard-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+    }
+
+    .card-col-12 {
+        grid-column: span 12;
+    }
+
+    .card-col-8 {
+        grid-column: span 8;
+    }
+
+    .card-col-6 {
+        grid-column: span 6;
+    }
+
+    .card-col-4 {
+        grid-column: span 4;
+    }
+
+    .card-col-3 {
+        grid-column: span 3;
+    }
+
+    .card-sm {
+        min-height: 200px;
+    }
+
+    .card-md {
+        min-height: 350px;
+    }
+
+    .card-lg {
+        min-height: 500px;
+    }
+
+    .card-header {
+        padding: 20px;
+        border-bottom: 1px solid rgba(233, 236, 239, 0.5);
+        background: transparent;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .card-title {
+        margin: 0;
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: var(--dark);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .card-subtitle {
+        margin: 5px 0 0;
+        font-size: 0.85rem;
+        color: var(--gray);
+    }
+
+    .card-actions {
+        display: flex;
+        gap: 5px;
+    }
+
+    .card-btn {
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--dark-gray);
+        background: transparent;
+        border: none;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .card-btn:hover {
+        background: var(--light-gray);
+        color: var(--primary);
+    }
+
+    .card-body {
+        padding: 20px;
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+    }
+
+    /* Container de gráficos */
+    .chart-container {
+        width: 100%;
+        height: 100%;
+        min-height: 250px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .chart-advanced {
+        width: 100%;
+        min-height: 300px;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    /* Tabelas */
+    .table-responsive {
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .dashboard-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .dashboard-table th {
+        text-align: left;
+        padding: 12px 15px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: var(--gray);
+        border-bottom: 1px solid var(--light-gray);
+    }
+
+    .dashboard-table td {
+        padding: 12px 15px;
+        font-size: 0.9rem;
+        color: var(--dark);
+        border-bottom: 1px solid var(--light-gray);
+        vertical-align: middle;
+    }
+
+    .dashboard-table tr:last-child td {
+        border-bottom: none;
+    }
+
+    .dashboard-table tbody tr {
+        transition: background-color 0.2s ease;
+    }
+
+    .dashboard-table tbody tr:hover {
+        background-color: rgba(0, 0, 0, 0.02);
+    }
+
+    /* Componentes de tabela */
+    .user-info, .table-product {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .avatar {
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 600;
+        font-size: 0.8rem;
+    }
+
+    .avatar-sm {
+        width: 32px;
+        height: 32px;
+        font-size: 0.75rem;
+    }
+
+    .avatar-primary {
+        background: var(--gradient-primary);
+    }
+
+    .avatar-danger {
+        background: var(--gradient-danger);
+    }
+
+    .user-details, .product-details {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .user-name, .product-name {
+        font-weight: 500;
+        margin-bottom: 2px;
+    }
+
+    .user-role, .product-category {
+        font-size: 0.8rem;
+        color: var(--gray);
+    }
+
+    .product-image {
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        background: var(--light-gray);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--dark-gray);
+    }
+
+    /* Badges */
+    .badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        font-weight: 500;
+        gap: 5px;
+    }
+
+    .badge-success {
+        background-color: rgba(12, 206, 107, 0.1);
+        color: #0cce6b;
+    }
+
+    .badge-warning {
+        background-color: rgba(255, 209, 102, 0.1);
+        color: #ffd166;
+    }
+
+    .badge-danger {
+        background-color: rgba(239, 71, 111, 0.1);
+        color: #ef476f;
+    }
+
+    /* Barras de progresso */
+    .progress-container {
+        margin-top: 15px;
+    }
+
+    .progress-header {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 5px;
+    }
+
+    .progress-title {
+        font-size: 0.85rem;
+        font-weight: 500;
+    }
+
+    .progress-value {
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+
+    .progress-bar-container {
+        height: 8px;
+        background-color: var(--light-gray);
+        border-radius: 4px;
+        overflow: hidden;
+    }
+    
+    .progress-bar-fill {
+        height: 100%;
+        border-radius: 4px;
+        transition: width 0.5s ease;
+    }
+
+    .progress-success {
+        background: var(--gradient-success);
+    }
+
+    .progress-warning {
+        background: var(--gradient-warning);
+    }
+
+    .progress-danger {
+        background: var(--gradient-danger);
+    }
+
+    /* Status de carregamento e sem dados */
+    .loading-container, .no-data {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 150px;
+        text-align: center;
+    }
+
+    .loading-spinner {
+        width: 40px;
+        height: 40px;
+        border: 3px solid rgba(67, 97, 238, 0.1);
+        border-left-color: var(--primary);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin-bottom: 15px;
+    }
+
+    .loading-text {
+        font-size: 0.9rem;
+        color: var(--gray);
+        font-weight: 500;
+    }
+
+    .no-data-icon {
+        font-size: 2rem;
+        color: var(--light-gray);
+        margin-bottom: 10px;
+    }
+
+    .no-data-text {
+        font-size: 1rem;
+        color: var(--dark-gray);
+        font-weight: 500;
+        margin-bottom: 5px;
+    }
+
+    .no-data-subtext {
+        font-size: 0.85rem;
+        color: var(--gray);
+    }
+
+    /* Mapa */
+    .map-container {
+        width: 100%;
+        height: 450px;
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+    #map {
+        width: 100%;
+        height: 100%;
+    }
+
+    .map-legend {
+        background-color: rgba(255, 255, 255, 0.9);
+        padding: 10px;
+        border-radius: 5px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .map-legend-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 5px;
+    }
+
+    .map-legend-color {
+        width: 15px;
+        height: 15px;
+        border-radius: 50%;
+        margin-right: 8px;
+    }
+
+    .leaflet-popup-content {
+        padding: 5px;
+        font-family: 'Roboto', sans-serif;
+    }
+
+    .map-popup-title {
+        font-weight: 600;
+        margin-bottom: 5px;
+        color: var(--dark);
+    }
+
+    .map-popup-info {
+        font-size: 0.9rem;
+        color: var(--gray);
+    }
+
+    /* Heatmap */
+    .heatmap-container {
+        width: 100%;
+        height: 350px;
+        overflow: hidden;
+        border-radius: 8px;
+    }
+
+    /* Animações */
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    .fade-in {
+        animation: fadeIn 0.6s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .pulse-effect {
+        animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+        0% { box-shadow: 0 0 0 0 rgba(67, 97, 238, 0.4); }
+        70% { box-shadow: 0 0 0 10px rgba(67, 97, 238, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(67, 97, 238, 0); }
+    }
+
+    /* Media Queries para responsividade */
+    @media (max-width: 1200px) {
+        .kpi-row, .metrics-overview {
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        }
+        
+        .card-col-4, .card-col-8 {
+            grid-column: span 6;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .card-col-4, .card-col-6, .card-col-8 {
+            grid-column: span 12;
+        }
+        
+        .filter-section {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        
+        .filter-group {
+            width: 100%;
+        }
+        
+        .filter-actions {
+            width: 100%;
+            justify-content: space-between;
+        }
+        
+        .dashboard-header {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+    }
+
+    /* Estilos para cards e tabelas */
+    .card-body {
+        padding: 20px;
+    }
+
+    .card-title {
+        font-size: 1.15rem;
+        font-weight: 600;
+        margin: 0;
+        color: var(--dark);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .card-title i {
+        color: #4303f0;
+    }
+
+    .card-subtitle {
+        font-size: 0.9rem;
+        color: var(--gray);
+        margin: 5px 0 0;
+    }
+
+    .card-actions {
+        display: flex;
+        gap: 5px;
+    }
+
+    .card-btn {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(67, 3, 240, 0.1);
+        color: #4303f0;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .card-btn:hover {
+        background: rgba(67, 3, 240, 0.2);
+        transform: translateY(-2px);
+    }
+
+    /* Estilos para tabelas */
+    .custom-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0;
+    }
+
+    .custom-table th {
+        background-color: rgba(246, 248, 250, 0.8);
+        color: var(--dark-gray);
+        font-weight: 600;
+        padding: 15px;
+        text-align: left;
+        font-size: 0.9rem;
+        border-bottom: 1px solid rgba(233, 236, 239, 0.7);
+    }
+
+    .custom-table td {
+        padding: 15px;
+        vertical-align: middle;
+        border-bottom: 1px solid rgba(233, 236, 239, 0.3);
+        color: var(--dark);
+        font-size: 0.95rem;
+    }
+
+    .custom-table tr:hover td {
+        background-color: rgba(246, 248, 250, 0.5);
+    }
+
+    .custom-table tr:last-child td {
+        border-bottom: none;
+    }
+
+    /* Estilo para gráficos */
+    .chart-container {
+        width: 100%;
+        height: 300px;
+        position: relative;
+    }
+
+    /* Melhorando a responsividade em dispositivos menores */
+    @media (max-width: 992px) {
+        .dashboard-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .card-col-8, .card-col-4 {
+            grid-column: span 1;
+        }
+        
+        .filter-section {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        
+        .filter-group {
+            width: 100%;
+        }
+        
+        .filter-actions {
+            width: 100%;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+        
+        .dashboard-header {
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .dashboard-logo {
+            width: 100%;
+            justify-content: space-between;
+        }
+        
+        .dashboard-title-section {
+            width: 100%;
+        }
+        
+        .dashboard-actions {
+            min-width: 180px;
+            display: flex;
+            justify-content: flex-end;
+            z-index: 2;
+        }
+    }
+    
+    @media (max-width: 768px) {
+        .kpi-row {
+            grid-template-columns: 1fr;
+        }
+        
+        .metrics-overview {
+            grid-template-columns: 1fr;
+        }
+        
+        .dashboard-header {
+            padding: 15px;
+        }
+        
+        .dashboard-title {
+            font-size: 1.5rem;
+        }
+        
+        .dashboard-subtitle {
+            font-size: 0.9rem;
+        }
+    }
+
+    .dashboard-title-section {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 0;
+        position: absolute;
+        width: 100%;
+        left: 0;
+        right: 0;
+        pointer-events: none;
+        z-index: 1;
+    }
+
+    .dashboard-icon {
+        width: 42px;
+        height: 42px;
+        border-radius: 10px;
+        background: #5d12f6;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.1rem;
+        box-shadow: 0 5px 15px rgba(93, 18, 246, 0.3);
+        margin-bottom: 8px;
+        pointer-events: auto;
+    }
+    
+    .dashboard-title {
+        margin: 0;
+        font-size: 1.4rem;
+        font-weight: 600;
+        color: #333;
+        text-align: center;
+    }
+
+    .dashboard-subtitle {
+        margin: 3px 0 0;
+        font-size: 0.85rem;
+        color: #666;
+        font-weight: 400;
+        text-align: center;
+    }
+
+    .dashboard-actions {
+        min-width: 180px;
+        display: flex;
+        justify-content: flex-end;
+        z-index: 2;
+    }
+
+    .dashboard-btn-back {
+        background: #6e19ff;
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 50px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 6px rgba(93, 18, 246, 0.2);
+        text-decoration: none;
+    }
+
+    .dashboard-btn-back:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 15px rgba(93, 18, 246, 0.4);
+        color: white;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="bg-shapes">
+    <div class="shape shape-1"></div>
+    <div class="shape shape-2"></div>
+    <div class="shape shape-3"></div>
+</div>
+<div class="dashboard-container">
+    <!-- Cabeçalho do Dashboard -->
+    <div class="dashboard-header">
+        <div class="dashboard-logo">
+            <img src="{% static 'images/logo.png' %}" alt="Logo CyberForce" class="logo-image">
+            <span style="font-size: 1.2em; font-weight: 700; color: #333;">CYBERFORCE</span>
+        </div>
+        <div class="dashboard-title-section" style="display: flex; flex-direction: row; align-items: center; justify-content: center;">
+            <div class="dashboard-icon" style="width: 1.4rem; height: 1.4rem; margin-bottom: 0; margin-right: 10px; font-size: 0.8rem;">
+                <i class="fas fa-chart-line"></i>
+            </div>
+            <h1 class="dashboard-title">Visão Gerencial Operacional</h1>
+        </div>
+        <div class="dashboard-actions">
+            <a href="/" class="dashboard-btn-back" title="Voltar ao menu principal">
+                <i class="fas fa-arrow-left"></i> Voltar
+            </a>
+        </div>
+    </div>
+        
+    <!-- Seção de Filtros -->
+    <div class="filter-section">
+        <div class="filter-title">
+            <i class="fas fa-filter"></i> Filtros
+            </div>
+        <div class="filter-group">
+            <div class="filter-item">
+                <label class="filter-label" for="company-filter">Empresa</label>
+                <select class="filter-select" id="company-filter">
+                    <option value="all">Todas as empresas</option>
+                    <!-- Opções serão carregadas dinamicamente -->
+                        </select>
+                    </div>
+            <div class="filter-item">
+                <label class="filter-label" for="contract-filter">Contrato</label>
+                <select class="filter-select" id="contract-filter">
+                    <option value="all">Todos os contratos</option>
+                    <!-- Opções serão carregadas dinamicamente -->
+                        </select>
+                    </div>
+            <div class="filter-item">
+                <label class="filter-label" for="period-filter">Período</label>
+                <select class="filter-select" id="period-filter">
+                    <option value="30">Últimos 30 dias</option>
+                    <option value="90">Últimos 90 dias</option>
+                    <option value="180">Últimos 6 meses</option>
+                    <option value="365">Último ano</option>
+                    <option value="all">Todo período</option>
+                </select>
+                    </div>
+                    </div>
+        <div class="filter-actions">
+            <button class="filter-btn" id="update-dashboard" title="Atualizar dados com os filtros selecionados">
+                <i class="fas fa-sync"></i> Atualizar
+            </button>
+            <button class="filter-btn filter-btn-outline" id="export-data" title="Exportar dados do dashboard">
+                <i class="fas fa-file-export"></i> Exportar
+            </button>
+            <button class="filter-btn filter-btn-outline" id="debug-data" title="Ver informações de diagnóstico">
+                <i class="fas fa-bug"></i> Diagnóstico
+            </button>
+            </div>
+        </div>
+        
+    <!-- Cards KPI principais -->
+    <div class="metrics-overview">
+                    <!-- Pedidos Pendentes -->
+        <div class="metric-card">
+            <div class="metric-header">
+                <h3 class="metric-title">Pedidos Pendentes</h3>
+                <div class="metric-icon metric-icon-pending">
+                    <i class="fas fa-clock"></i>
+                            </div>
+                        </div>
+            <div class="metric-value" id="pending-orders">0</div>
+            <div class="metric-trend" id="pending-trend">
+                <i class="fas fa-arrow-up"></i> 0% desde o último período
+            </div>
+            <div class="metric-progress" style="width: 65%; background: var(--pending-color);"></div>
+                    </div>
+                    
+                    <!-- Pedidos Aprovados -->
+        <div class="metric-card">
+            <div class="metric-header">
+                <h3 class="metric-title">Pedidos Aprovados</h3>
+                <div class="metric-icon metric-icon-approved">
+                    <i class="fas fa-check-circle"></i>
+                            </div>
+                        </div>
+            <div class="metric-value" id="approved-orders">0</div>
+            <div class="metric-trend" id="approved-trend">
+                <i class="fas fa-arrow-up"></i> 0% desde o último período
+            </div>
+            <div class="metric-progress" style="width: 75%; background: var(--approved-color);"></div>
+                    </div>
+                    
+                    <!-- Pedidos Enviados -->
+        <div class="metric-card">
+            <div class="metric-header">
+                <h3 class="metric-title">Pedidos Enviados</h3>
+                <div class="metric-icon metric-icon-shipped">
+                    <i class="fas fa-shipping-fast"></i>
+                            </div>
+                        </div>
+            <div class="metric-value" id="shipped-orders">0</div>
+            <div class="metric-trend" id="shipped-trend">
+                <i class="fas fa-arrow-up"></i> 0% desde o último período
+            </div>
+            <div class="metric-progress" style="width: 60%; background: var(--shipped-color);"></div>
+                    </div>
+                    
+                    <!-- Pedidos Entregues -->
+        <div class="metric-card">
+            <div class="metric-header">
+                <h3 class="metric-title">Pedidos Entregues</h3>
+                <div class="metric-icon metric-icon-delivered">
+                    <i class="fas fa-box-open"></i>
+                            </div>
+                        </div>
+            <div class="metric-value" id="delivered-orders">0</div>
+            <div class="metric-trend" id="delivered-trend">
+                <i class="fas fa-arrow-up"></i> 0% desde o último período
+            </div>
+            <div class="metric-progress" style="width: 80%; background: var(--delivered-color);"></div>
+                    </div>
+                    
+                    <!-- Pedidos Cancelados -->
+        <div class="metric-card">
+            <div class="metric-header">
+                <h3 class="metric-title">Pedidos Cancelados</h3>
+                <div class="metric-icon metric-icon-canceled">
+                    <i class="fas fa-ban"></i>
+                            </div>
+                        </div>
+            <div class="metric-value" id="canceled-orders">0</div>
+            <div class="metric-trend" id="canceled-trend">
+                <i class="fas fa-arrow-down"></i> 0% desde o último período
+            </div>
+            <div class="metric-progress" style="width: 25%; background: var(--canceled-color);"></div>
+                    </div>
+                    
+        <!-- Total de Contratos Ativos -->
+        <div class="metric-card">
+            <div class="metric-header">
+                <h3 class="metric-title">Contratos Ativos</h3>
+                <div class="metric-icon metric-icon-contracts">
+                    <i class="fas fa-file-contract"></i>
+                            </div>
+                        </div>
+            <div class="metric-value" id="active-contracts">0</div>
+            <div class="metric-trend" id="contracts-trend">
+                <i class="fas fa-arrow-up"></i> 0% desde o último período
+                    </div>
+            <div class="metric-progress" style="width: 70%; background: var(--contracts-color);"></div>
+            </div>
+        </div>
+        
+    <!-- Início do dashboard grid - Visualizações principais -->
+    <div class="dashboard-grid">
+        <!-- Gráfico de valor total de pedidos por mês -->
+        <div class="dashboard-card card-col-8 card-md">
+            <div class="card-header">
+                <div>
+                    <h3 class="card-title"><i class="fas fa-chart-line"></i> Valor Total de Pedidos por Mês</h3>
+                    <p class="card-subtitle">Evolução mensal do valor total de pedidos</p>
+                            </div>
+                <div class="card-actions">
+                    <button class="card-btn" title="Exportar"><i class="fas fa-download"></i></button>
+                    <button class="card-btn" title="Expandir"><i class="fas fa-expand"></i></button>
+                </div>
+            </div>
+            <div class="card-body">
+                <div id="monthly-orders-chart" class="chart-container"></div>
+                        </div>
+                    </div>
+                    
+        <!-- Gráfico de pizza com status dos pedidos -->
+        <div class="dashboard-card card-col-4 card-md">
+            <div class="card-header">
+                <div>
+                    <h3 class="card-title"><i class="fas fa-chart-pie"></i> Status dos Pedidos</h3>
+                    <p class="card-subtitle">Distribuição por status atual</p>
+                                </div>
+                <div class="card-actions">
+                    <button class="card-btn" title="Exportar"><i class="fas fa-download"></i></button>
+                    <button class="card-btn" title="Expandir"><i class="fas fa-expand"></i></button>
+                            </div>
+            </div>
+            <div class="card-body">
+                <div id="orders-status-chart" class="chart-container"></div>
+                        </div>
+                    </div>
+                    
+        <!-- Ranking de supervisores com mais contratos -->
+        <div class="dashboard-card card-col-4 card-md">
+            <div class="card-header">
+                <div>
+                    <h3 class="card-title"><i class="fas fa-trophy"></i> Top Supervisores</h3>
+                    <p class="card-subtitle">Por quantidade de contratos ativos</p>
+                            </div>
+                <div class="card-actions">
+                    <button class="card-btn" title="Exportar"><i class="fas fa-download"></i></button>
+                    <button class="card-btn" title="Expandir"><i class="fas fa-expand"></i></button>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="dashboard-table" id="supervisors-table">
+                        <thead>
+                            <tr>
+                                <th>Supervisor</th>
+                                <th>Contratos Ativos</th>
+                                <th>Performance</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <div class="user-info">
+                                        <div class="avatar avatar-primary">MS</div>
+                                        <div class="user-details">
+                                            <div class="user-name">Maria Silva</div>
+                                            <div class="user-role">Supervisor Sênior</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>12</td>
+                                <td>
+                                    <span class="badge badge-success">
+                                        <i class="fas fa-arrow-up"></i> 8%
+                                    </span>
+                                </td>
+                            </tr>
+                            <!-- Mais linhas serão adicionadas dinamicamente -->
+                        </tbody>
+                    </table>
+                </div>
+                        </div>
+                    </div>
+                    
+        <!-- Budgets Estourados -->
+        <div class="dashboard-card card-col-8 card-md">
+            <div class="card-header">
+                <div>
+                    <h3 class="card-title"><i class="fas fa-exclamation-triangle"></i> Budgets Estourados</h3>
+                    <p class="card-subtitle">Contratos com orçamento por pedido excedido</p>
+                            </div>
+                <div class="card-actions">
+                    <button class="card-btn" title="Exportar"><i class="fas fa-download"></i></button>
+                    <button class="card-btn" title="Expandir"><i class="fas fa-expand"></i></button>
+                        </div>
+                    </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="dashboard-table" id="budget-table">
+                        <thead>
+                            <tr>
+                                <th>Contrato</th>
+                                <th>Empresa</th>
+                                <th>Orçamento</th>
+                                <th>Valor Atual</th>
+                                <th>Excedido</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Dados serão carregados dinamicamente -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Produtos mais pedidos -->
+        <div class="dashboard-card card-col-6 card-md">
+            <div class="card-header">
+                <div>
+                    <h3 class="card-title"><i class="fas fa-star"></i> Produtos Mais Pedidos</h3>
+                    <p class="card-subtitle">Top produtos por volume de pedidos</p>
+                </div>
+                <div class="card-actions">
+                    <button class="card-btn" title="Exportar"><i class="fas fa-download"></i></button>
+                    <button class="card-btn" title="Expandir"><i class="fas fa-expand"></i></button>
+                </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                    <table class="dashboard-table" id="top-products-table">
+                                <thead>
+                                    <tr>
+                                        <th>Produto</th>
+                                <th>Qtd. Pedidos</th>
+                                <th>Valor Total</th>
+                                <th>Tendência</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                            <!-- Dados serão carregados dinamicamente -->
+                                </tbody>
+                            </table>
+                    </div>
+                </div>
+            </div>
+            
+        <!-- Produtos menos pedidos -->
+        <div class="dashboard-card card-col-6 card-md">
+            <div class="card-header">
+                <div>
+                    <h3 class="card-title"><i class="fas fa-thumbs-down"></i> Produtos Menos Solicitados</h3>
+                    <p class="card-subtitle">Produtos com menor volume de pedidos</p>
+                </div>
+                <div class="card-actions">
+                    <button class="card-btn" title="Exportar"><i class="fas fa-download"></i></button>
+                    <button class="card-btn" title="Expandir"><i class="fas fa-expand"></i></button>
+                </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                    <table class="dashboard-table" id="bottom-products-table">
+                                <thead>
+                                    <tr>
+                                        <th>Produto</th>
+                                <th>Qtd. Pedidos</th>
+                                <th>Valor Total</th>
+                                <th>Último Pedido</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                            <!-- Dados serão carregados dinamicamente -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+        <!-- Utilização de Budget por Contrato -->
+        <div class="dashboard-card card-col-8 card-md">
+            <div class="card-header">
+                <div>
+                    <h3 class="card-title"><i class="fas fa-wallet"></i> Utilização de Budget por Contrato</h3>
+                    <p class="card-subtitle">Percentual de orçamento utilizado</p>
+                </div>
+                <div class="card-actions">
+                    <button class="card-btn" title="Exportar"><i class="fas fa-download"></i></button>
+                    <button class="card-btn" title="Expandir"><i class="fas fa-expand"></i></button>
+                </div>
+            </div>
+            <div class="card-body">
+                <div id="budget-usage-chart" class="chart-container"></div>
+            </div>
+        </div>
+        
+        <!-- Indicadores Financeiros -->
+        <div class="dashboard-card card-col-4 card-md">
+            <div class="card-header">
+                <div>
+                    <h3 class="card-title"><i class="fas fa-chart-bar"></i> Indicadores Financeiros</h3>
+                    <p class="card-subtitle">Desempenho atual vs. período anterior</p>
+                </div>
+                <div class="card-actions">
+                    <button class="card-btn" title="Exportar"><i class="fas fa-download"></i></button>
+                    <button class="card-btn" title="Expandir"><i class="fas fa-expand"></i></button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                <div class="progress-container">
+                    <div class="progress-header">
+                        <div class="progress-title">Valor Médio por Pedido</div>
+                        <div class="progress-value" id="avg-order-value">R$ 0,00</div>
+                        </div>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar-fill progress-success" id="avg-order-bar" style="width: 0%"></div>
+                    </div>
+                </div>
+                
+                <div class="progress-container">
+                    <div class="progress-header">
+                        <div class="progress-title">Taxa de Aprovação</div>
+                        <div class="progress-value" id="approval-rate">0,0%</div>
+                    </div>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar-fill progress-success" id="approval-bar" style="width: 0%"></div>
+            </div>
+        </div>
+        
+                <div class="progress-container">
+                    <div class="progress-header">
+                        <div class="progress-title">Taxa de Cancelamento</div>
+                        <div class="progress-value" id="cancellation-rate">0,0%</div>
+                    </div>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar-fill progress-warning" id="cancellation-bar" style="width: 0%"></div>
+                    </div>
+        </div>
+    </div>
+</div>
+
+        <!-- Previsões e Insights -->
+        <div class="dashboard-card card-col-12 card-sm">
+            <div class="card-header">
+                <div>
+                    <h3 class="card-title"><i class="fas fa-lightbulb"></i> Previsões e Insights</h3>
+                    <p class="card-subtitle">Análises avançadas para tomada de decisão</p>
+                </div>
+                <div class="card-actions">
+                    <button class="card-btn" title="Atualizar"><i class="fas fa-sync-alt"></i></button>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row" id="insights-container">
+                    <!-- Os insights serão preenchidos dinamicamente via JavaScript -->
+                    <div class="col-md-4">
+                        <div class="alert alert-info">
+                            <strong><i class="fas fa-circle-notch fa-spin"></i> Carregando insights...</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('Dashboard de Visão Gerencial carregado com sucesso!');
+        
+        // Cores para gráficos
+        const colors = {
+            primary: getComputedStyle(document.documentElement).getPropertyValue('--primary').trim(),
+            secondary: getComputedStyle(document.documentElement).getPropertyValue('--secondary').trim(),
+            success: getComputedStyle(document.documentElement).getPropertyValue('--success').trim(),
+            warning: getComputedStyle(document.documentElement).getPropertyValue('--warning').trim(),
+            danger: getComputedStyle(document.documentElement).getPropertyValue('--danger').trim(),
+            info: getComputedStyle(document.documentElement).getPropertyValue('--info').trim(),
+            pending: getComputedStyle(document.documentElement).getPropertyValue('--pending-color').trim(),
+            approved: getComputedStyle(document.documentElement).getPropertyValue('--approved-color').trim(),
+            shipped: getComputedStyle(document.documentElement).getPropertyValue('--shipped-color').trim(),
+            delivered: getComputedStyle(document.documentElement).getPropertyValue('--delivered-color').trim(),
+            canceled: getComputedStyle(document.documentElement).getPropertyValue('--canceled-color').trim(),
+            contracts: getComputedStyle(document.documentElement).getPropertyValue('--contracts-color').trim()
+        };
+        
+        // Formatadores
+        function formatCurrency(value) {
+            return new Intl.NumberFormat('pt-BR', { 
+                style: 'currency', 
+                currency: 'BRL',
+                minimumFractionDigits: 2
+            }).format(value);
+        }
+        
+        function formatDecimal(value) {
+            return new Intl.NumberFormat('pt-BR', { 
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2 
+            }).format(value);
+        }
+        
+        function formatPercent(value) {
+            return new Intl.NumberFormat('pt-BR', { 
+                style: 'percent', 
+                minimumFractionDigits: 1,
+                maximumFractionDigits: 1 
+            }).format(value/100);
+        }
+        
+        // Estado do dashboard
+        const dashboardState = {
+            isLoading: true,
+            filters: {
+                company: 'all',
+                contract: 'all',
+                period: '30'
+            }
+        };
+        
+        // Simula o carregamento dos dados
+        function loadDashboardData() {
+            toggleLoading(true);
+            
+            // URL correta da API para buscar os dados reais
+            const url = `/visao-gerencial/dados/?empresa=${dashboardState.filters.company}&contrato=${dashboardState.filters.contract}&periodo=${dashboardState.filters.period}`;
+            
+            console.log("Fazendo requisição para:", url);
+            
+            // Fazer requisição AJAX para buscar dados reais
+            fetch(url)
+                .then(response => {
+                    console.log("Status da resposta:", response.status);
+                    if (!response.ok) {
+                        return response.json().then(errorData => {
+                            throw {
+                                status: response.status,
+                                data: errorData
+                            };
+                        });
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // Log para depuração
+                    console.log("Dados recebidos com sucesso:", data);
+                    
+                    // Se houver dados de debug, mostrar no console
+                    if (data.debug) {
+                        console.log("Informações de debug:", data.debug);
+                    }
+                    
+                    // Preencher os filtros com os dados recebidos, se disponíveis
+                    if (data.filterOptions) {
+                        populateFilterOptions(data.filterOptions);
+                    } else {
+                        // Se não houver dados de filtro, carregar opções de amostra
+                        populateFilterOptions({
+                            companies: [
+                                { id: 'emp1', name: 'Tecnologia Avançada Ltda' },
+                                { id: 'emp2', name: 'Indústrias Reunidas SA' },
+                                { id: 'emp3', name: 'Comércio Digital Expressway' },
+                                { id: 'emp4', name: 'Distribuidora Nacional' },
+                                { id: 'emp5', name: 'Serviços Integrados Brasil' }
+                            ],
+                            contracts: [
+                                { id: 'con1', name: 'CON-2023-0125', company_id: 'emp1' },
+                                { id: 'con2', name: 'CON-2023-0187', company_id: 'emp2' },
+                                { id: 'con3', name: 'CON-2023-0204', company_id: 'emp3' },
+                                { id: 'con4', name: 'CON-2023-0078', company_id: 'emp4' },
+                                { id: 'con5', name: 'CON-2023-0256', company_id: 'emp5' }
+                            ]
+                        });
+                    }
+                    
+                    // Processar e exibir os dados reais
+                    updateDashboard(data);
+                    toggleLoading(false);
+                })
+                .catch(error => {
+                    console.error('Erro detalhado ao carregar dados:', error);
+                    
+                    let errorMessage = 'Não foi possível carregar os dados reais. Exibindo dados de amostra para demonstração.';
+                    
+                    // Se tiver detalhes do erro, mostrar
+                    if (error.data && error.data.message) {
+                        errorMessage = `Erro: ${error.data.message}`;
+                        
+                        // Se tiver linha do erro
+                        if (error.data.line) {
+                            errorMessage += ` (linha ${error.data.line})`;
+                        }
+                        
+                        // Se tiver tipo do erro
+                        if (error.data.error_type) {
+                            errorMessage += ` [${error.data.error_type}]`;
+                        }
+                        
+                        // Mostrar o trace no console para debugging
+                        if (error.data.trace) {
+                            console.error('Stack trace do erro:', error.data.trace);
+                        }
+                    }
+                    
+                    // Exibir mensagem de erro em um alert e no console
+                    alert(errorMessage);
+                    
+                    // Em caso de erro, usar dados de amostra
+                    const sampleData = generateSampleData();
+                    updateDashboard(sampleData);
+                    toggleLoading(false);
+                });
+        }
+        
+        // Ativar/desativar estado de carregamento
+        function toggleLoading(isLoading) {
+            dashboardState.isLoading = isLoading;
+            
+            const chartContainers = document.querySelectorAll('.chart-container');
+            const metricValues = document.querySelectorAll('.metric-value');
+            
+            if (isLoading) {
+                chartContainers.forEach(container => {
+                    container.innerHTML = `
+                        <div class="loading-container">
+                            <div class="loading-spinner"></div>
+                            <div class="loading-text">Carregando dados...</div>
+                        </div>
+                    `;
+                });
+                
+                metricValues.forEach(value => {
+                    value.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                });
+            } else {
+                // Quando isLoading for false (dados carregados), garantir que as mensagens de carregamento sejam removidas
+                chartContainers.forEach(container => {
+                    // Limpar qualquer mensagem de carregamento que ainda esteja presente
+                    const loadingElement = container.querySelector('.loading-container');
+                    if (loadingElement) {
+                        loadingElement.remove();
+                    }
+                });
+            }
+        }
+        
+        // Exibir mensagem de "sem dados"
+        function showNoData(container, message = 'Nenhum dado disponível') {
+            container.innerHTML = `
+                <div class="no-data">
+                    <div class="no-data-icon"><i class="fas fa-database"></i></div>
+                    <div class="no-data-text">${message}</div>
+                    <div class="no-data-subtext">Tente alterar os filtros ou verificar mais tarde.</div>
+                </div>
+            `;
+        }
+        
+        // Gerar dados de amostra (em produção, esses dados viriam do backend)
+        function generateSampleData() {
+            return {
+                // Métricas gerais
+                metrics: {
+                    pendingOrders: 248,
+                    pendingTrend: 5.2,
+                    approvedOrders: 362,
+                    approvedTrend: 12.8,
+                    shippedOrders: 183,
+                    shippedTrend: 8.4,
+                    deliveredOrders: 614,
+                    deliveredTrend: 15.2,
+                    canceledOrders: 57,
+                    canceledTrend: -3.5,
+                    activeContracts: 42,
+                    contractsTrend: 4.8
+                },
+                // Indicadores Financeiros
+                financialIndicators: {
+                    averageOrderValue: 3450.25,
+                    averageOrderValuePercent: 75.0,
+                    approvalRate: 87.3,
+                    approvalRatePercent: 87.0,
+                    cancellationRate: 4.8,
+                    cancellationRatePercent: 38.0
+                },
+                // Insights e previsões
+                insights: [
+                    {
+                        type: 'growth',
+                        icon: 'arrow-trend-up',
+                        title: 'Tendência de crescimento',
+                        message: 'Aumento de 15% nos pedidos aprovados previsto para o próximo trimestre.',
+                        alertType: 'info'
+                    },
+                    {
+                        type: 'alert',
+                        icon: 'triangle-exclamation',
+                        title: 'Atenção',
+                        message: '3 contratos próximos do limite orçamentário requerem revisão.',
+                        alertType: 'warning'
+                    },
+                    {
+                        type: 'opportunity',
+                        icon: 'bullseye',
+                        title: 'Oportunidade',
+                        message: 'Potencial de expansão identificado em 5 contratos com alta taxa de utilização.',
+                        alertType: 'success'
+                    }
+                ],
+                // Dados para o gráfico de pedidos mensais
+                monthlyOrders: [
+                    { month: 'Jan', value: 325000 },
+                    { month: 'Fev', value: 298000 },
+                    { month: 'Mar', value: 356000 },
+                    { month: 'Abr', value: 410000 },
+                    { month: 'Mai', value: 432000 },
+                    { month: 'Jun', value: 475000 },
+                    { month: 'Jul', value: 510000 },
+                    { month: 'Ago', value: 492000 },
+                    { month: 'Set', value: 530000 },
+                    { month: 'Out', value: 558000 },
+                    { month: 'Nov', value: 615000 },
+                    { month: 'Dez', value: 684000 }
+                ],
+                // Dados para o gráfico de status
+                orderStatus: [
+                    { status: 'Pendentes', value: 248, color: colors.pending },
+                    { status: 'Aprovados', value: 362, color: colors.approved },
+                    { status: 'Enviados', value: 183, color: colors.shipped },
+                    { status: 'Entregues', value: 614, color: colors.delivered },
+                    { status: 'Cancelados', value: 57, color: colors.canceled }
+                ],
+                // Top supervisores
+                topSupervisors: [
+                    { name: 'Maria Silva', role: 'Supervisor Sênior', initials: 'MS', contracts: 12, trend: 8 },
+                    { name: 'João Oliveira', role: 'Supervisor Regional', initials: 'JO', contracts: 10, trend: 5 },
+                    { name: 'Ana Pereira', role: 'Supervisor Nacional', initials: 'AP', contracts: 9, trend: -2 },
+                    { name: 'Carlos Santos', role: 'Supervisor Júnior', initials: 'CS', contracts: 7, trend: 12 },
+                    { name: 'Luciana Costa', role: 'Supervisor Regional', initials: 'LC', contracts: 5, trend: 3 }
+                ],
+                // Budgets estourados
+                exceededBudgets: [
+                    { contract: 'CON-2023-0125', company: 'Tecnologia Avançada Ltda', budget: 120000, current: 145800, status: 'Crítico' },
+                    { contract: 'CON-2023-0187', company: 'Indústrias Reunidas SA', budget: 85000, current: 92500, status: 'Atenção' },
+                    { contract: 'CON-2023-0204', company: 'Comércio Digital Expressway', budget: 65000, current: 72100, status: 'Atenção' },
+                    { contract: 'CON-2023-0078', company: 'Distribuidora Nacional', budget: 230000, current: 285000, status: 'Crítico' },
+                    { contract: 'CON-2023-0256', company: 'Serviços Integrados Brasil', budget: 150000, current: 157500, status: 'Atenção' },
+                ],
+                // Produtos mais pedidos
+                topProducts: [
+                    { name: 'Notebook Corporativo Pro', category: 'Eletrônicos', orders: 142, value: 710000, trend: 15 },
+                    { name: 'Smartphone Enterprise X5', category: 'Eletrônicos', orders: 126, value: 378000, trend: 12 },
+                    { name: 'Mobiliário Ergonômico Deluxe', category: 'Mobiliário', orders: 98, value: 294000, trend: 8 },
+                    { name: 'Servidor Cloud Station TX', category: 'TI', orders: 83, value: 415000, trend: 5 },
+                    { name: 'Licença Premium Suite Office', category: 'Software', orders: 77, value: 115500, trend: 18 }
+                ],
+                // Produtos menos pedidos
+                bottomProducts: [
+                    { name: 'Scanner Industrial K7', category: 'Eletrônicos', orders: 3, value: 15000, lastOrder: '12/10/2023' },
+                    { name: 'Projetor Antiquado VGA', category: 'Eletrônicos', orders: 5, value: 10000, lastOrder: '25/09/2023' },
+                    { name: 'Calculadora Financeira TX', category: 'Acessórios', orders: 7, value: 3500, lastOrder: '18/11/2023' },
+                    { name: 'Mesa de Reunião Circular', category: 'Mobiliário', orders: 8, value: 24000, lastOrder: '05/12/2023' },
+                    { name: 'Telefone Fixo Executivo', category: 'Comunicação', orders: 9, value: 4500, lastOrder: '30/11/2023' }
+                ],
+                // Utilização de budget por contrato
+                budgetUsage: [
+                    { contract: 'Tecnologia Avançada Ltda', budget: 120000, used: 145800, percentage: 121.5 },
+                    { contract: 'Indústrias Reunidas SA', budget: 85000, used: 92500, percentage: 108.8 },
+                    { contract: 'Comércio Digital Expressway', budget: 65000, used: 72100, percentage: 110.9 },
+                    { contract: 'Distribuidora Nacional', budget: 230000, used: 285000, percentage: 123.9 },
+                    { contract: 'Serviços Integrados Brasil', budget: 150000, used: 157500, percentage: 105.0 },
+                    { contract: 'Logística Express', budget: 95000, used: 75000, percentage: 78.9 },
+                    { contract: 'Consultoria Empresarial', budget: 110000, used: 82500, percentage: 75.0 },
+                    { contract: 'Manufatura Global', budget: 175000, used: 125000, percentage: 71.4 },
+                ]
+            };
+        }
+        
+        // Atualizar o dashboard com os dados
+        function updateDashboard(data) {
+            // Atualizar métricas KPI
+            document.getElementById('pending-orders').textContent = data.metrics.pendingOrders;
+            document.getElementById('pending-trend').innerHTML = getTrendHTML(data.metrics.pendingTrend);
+            
+            document.getElementById('approved-orders').textContent = data.metrics.approvedOrders;
+            document.getElementById('approved-trend').innerHTML = getTrendHTML(data.metrics.approvedTrend);
+            
+            document.getElementById('shipped-orders').textContent = data.metrics.shippedOrders;
+            document.getElementById('shipped-trend').innerHTML = getTrendHTML(data.metrics.shippedTrend);
+            
+            document.getElementById('delivered-orders').textContent = data.metrics.deliveredOrders;
+            document.getElementById('delivered-trend').innerHTML = getTrendHTML(data.metrics.deliveredTrend);
+            
+            document.getElementById('canceled-orders').textContent = data.metrics.canceledOrders;
+            document.getElementById('canceled-trend').innerHTML = getTrendHTML(data.metrics.canceledTrend, true);
+            
+            document.getElementById('active-contracts').textContent = data.metrics.activeContracts;
+            document.getElementById('contracts-trend').innerHTML = getTrendHTML(data.metrics.contractsTrend);
+            
+            // Atualizar Indicadores Financeiros
+            if (data.financialIndicators) {
+                // Valor Médio por Pedido
+                const avgValue = document.getElementById('avg-order-value');
+                const avgBar = document.getElementById('avg-order-bar');
+                avgValue.textContent = formatCurrency(data.financialIndicators.averageOrderValue);
+                avgBar.style.width = `${Math.min(data.financialIndicators.averageOrderValuePercent, 100)}%`;
+                if (data.financialIndicators.averageOrderValue < 1000) {
+                    avgBar.className = 'progress-bar-fill progress-warning';
+                } else if (data.financialIndicators.averageOrderValue < 2000) {
+                    avgBar.className = 'progress-bar-fill progress-info';
+                } else {
+                    avgBar.className = 'progress-bar-fill progress-success';
+                }
+                
+                // Taxa de Aprovação
+                const approvalRate = document.getElementById('approval-rate');
+                const approvalBar = document.getElementById('approval-bar');
+                approvalRate.textContent = `${data.financialIndicators.approvalRate.toFixed(1).replace('.', ',')}%`;
+                approvalBar.style.width = `${Math.min(data.financialIndicators.approvalRate, 100)}%`;
+                if (data.financialIndicators.approvalRate < 50) {
+                    approvalBar.className = 'progress-bar-fill progress-danger';
+                } else if (data.financialIndicators.approvalRate < 80) {
+                    approvalBar.className = 'progress-bar-fill progress-warning';
+                } else {
+                    approvalBar.className = 'progress-bar-fill progress-success';
+                }
+                
+                // Taxa de Cancelamento
+                const cancellationRate = document.getElementById('cancellation-rate');
+                const cancellationBar = document.getElementById('cancellation-bar');
+                cancellationRate.textContent = `${data.financialIndicators.cancellationRate.toFixed(1).replace('.', ',')}%`;
+                cancellationBar.style.width = `${Math.min(data.financialIndicators.cancellationRate * 2, 100)}%`; // * 2 para visualização melhor
+                if (data.financialIndicators.cancellationRate > 10) {
+                    cancellationBar.className = 'progress-bar-fill progress-danger';
+                } else if (data.financialIndicators.cancellationRate > 5) {
+                    cancellationBar.className = 'progress-bar-fill progress-warning';
+                } else {
+                    cancellationBar.className = 'progress-bar-fill progress-success';
+                }
+            }
+            
+            // Atualizar Previsões e Insights
+            if (data.insights) {
+                updateInsights(data.insights);
+            }
+            
+            // Renderizar gráficos
+            renderMonthlyOrdersChart(data.monthlyOrders);
+            renderOrderStatusChart(data.orderStatus);
+            renderBudgetUsageChart(data.budgetUsage);
+            
+            // Preencher tabelas
+            populateSupervisorsTable(data.topSupervisors);
+            populateBudgetTable(data.exceededBudgets);
+            populateProductsTable(data.topProducts, 'top-products-table', true);
+            populateProductsTable(data.bottomProducts, 'bottom-products-table', false);
+        }
+        
+        // Atualizar o card de Previsões e Insights
+        function updateInsights(insights) {
+            const container = document.getElementById('insights-container');
+            
+            // Limpar conteúdo existente
+            container.innerHTML = '';
+            
+            // Se não houver insights, mostrar mensagem padrão
+            if (!insights || insights.length === 0) {
+                container.innerHTML = `
+                    <div class="col-md-12">
+                        <div class="alert alert-info">
+                            <strong><i class="fas fa-info-circle"></i> Informação:</strong> 
+                            Não há insights disponíveis no momento. Continue alimentando o sistema com dados para obter análises mais relevantes.
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Adicionar cada insight como um card
+            insights.forEach(insight => {
+                const col = document.createElement('div');
+                col.className = 'col-md-4';
+                
+                // Definir cor do alerta com base no tipo
+                let alertClass = 'alert-info'; // padrão
+                if (insight.alertType === 'warning') {
+                    alertClass = 'alert-warning';
+                } else if (insight.alertType === 'success') {
+                    alertClass = 'alert-success';
+                } else if (insight.alertType === 'danger') {
+                    alertClass = 'alert-danger';
+                }
+                
+                col.innerHTML = `
+                    <div class="alert ${alertClass}">
+                        <strong><i class="fas fa-${insight.icon}"></i> ${insight.title}:</strong> 
+                        ${insight.message}
+                    </div>
+                `;
+                
+                container.appendChild(col);
+            });
+        }
+        
+        // Renderizar o gráfico de valor total de pedidos mensais
+        function renderMonthlyOrdersChart(data) {
+            // Limpar o contêiner completamente antes de renderizar o gráfico
+            const chartContainer = document.querySelector("#monthly-orders-chart");
+            chartContainer.innerHTML = '';
+            
+            const options = {
+                series: [{
+                    name: 'Valor Total',
+                    data: data.map(item => item.value)
+                }],
+                chart: {
+                    height: 300,
+                    type: 'bar',
+                    toolbar: {
+                        show: true
+                    },
+                    animations: {
+                        enabled: true,
+                        easing: 'easeinout',
+                        speed: 800
+                    }
+                },
+                plotOptions: {
+                    bar: {
+                        borderRadius: 8,
+                        columnWidth: '60%',
+                        distributed: false,
+                        dataLabels: {
+                            position: 'top',
+                        }
+                    }
+                },
+                dataLabels: {
+                    enabled: false
+                },
+                grid: {
+                    borderColor: '#f1f1f1',
+                    row: {
+                        colors: ['transparent', 'transparent']
+                    }
+                },
+                colors: [colors.primary],
+                xaxis: {
+                    categories: data.map(item => item.month),
+                    labels: {
+                        style: {
+                            fontSize: '12px'
+                        }
+                    }
+                },
+                yaxis: {
+                    title: {
+                        text: 'Valor Total (R$)'
+                    },
+                    labels: {
+                        formatter: function(val) {
+                            return 'R$ ' + val.toLocaleString('pt-BR');
+                        }
+                    }
+                },
+                tooltip: {
+                    y: {
+                        formatter: function(val) {
+                            return formatCurrency(val);
+                        }
+                    }
+                },
+                title: {
+                    text: 'Valor Total de Pedidos por Mês',
+                    align: 'left',
+                    style: {
+                        fontSize: '14px',
+                        fontWeight: 500
+                    }
+                }
+            };
+
+            const chart = new ApexCharts(document.querySelector("#monthly-orders-chart"), options);
+            chart.render();
+        }
+        
+        // Renderizar o gráfico de pizza do status dos pedidos
+        function renderOrderStatusChart(data) {
+            // Limpar o contêiner completamente antes de renderizar
+            const chartContainer = document.querySelector("#orders-status-chart");
+            chartContainer.innerHTML = '';
+            
+            const options = {
+                series: data.map(item => item.value),
+                chart: {
+                    type: 'donut',
+                    height: 300
+                },
+                labels: data.map(item => item.status),
+                colors: data.map(item => item.color),
+                plotOptions: {
+                    pie: {
+                        donut: {
+                            size: '55%',
+                            labels: {
+                                show: true,
+                                total: {
+                                    show: true,
+                                    label: 'Total',
+                                    formatter: function (w) {
+                                        return w.globals.seriesTotals.reduce((a, b) => a + b, 0);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                legend: {
+                    position: 'bottom'
+                },
+                responsive: [{
+                    breakpoint: 480,
+                    options: {
+                        chart: {
+                            width: 250
+                        },
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }],
+                dataLabels: {
+                    formatter: function(val, opts) {
+                        return opts.w.globals.seriesTotals[opts.seriesIndex];
+                    }
+                }
+            };
+
+            const chart = new ApexCharts(document.querySelector("#orders-status-chart"), options);
+            chart.render();
+        }
+        
+        // Renderizar o gráfico de utilização de budget por contrato
+        function renderBudgetUsageChart(data) {
+            // Limpar o contêiner completamente antes de renderizar
+            const chartContainer = document.querySelector("#budget-usage-chart");
+            chartContainer.innerHTML = '';
+            
+            const options = {
+                series: [{
+                    name: 'Utilização do Budget',
+                    data: data.map(item => item.percentage)
+                }],
+                chart: {
+                    height: 300,
+                    type: 'bar',
+                    toolbar: {
+                        show: true
+                    }
+                },
+                plotOptions: {
+                    bar: {
+                        horizontal: true,
+                        borderRadius: 6,
+                        distributed: true,
+                        dataLabels: {
+                            position: 'top'
+                        }
+                    }
+                },
+                colors: data.map(item => 
+                    item.percentage > 100 ? colors.danger : 
+                    item.percentage > 80 ? colors.warning : 
+                    colors.success
+                ),
+                dataLabels: {
+                    enabled: true,
+                    formatter: function(val) {
+                        return val.toFixed(1) + '%';
+                    },
+                    offsetX: 15,
+                    style: {
+                        fontSize: '12px',
+                        colors: ['#212529']
+                    }
+                },
+                xaxis: {
+                    categories: data.map(item => item.contract),
+                    labels: {
+                        style: {
+                            fontSize: '12px',
+                            fontWeight: 500
+                        }
+                    }
+                },
+                yaxis: {
+                    title: {
+                        text: '% Utilizado',
+                    },
+                    min: 0,
+                    max: 150,
+                    tickAmount: 3
+                },
+                title: {
+                    text: 'Utilização de Budget por Contrato',
+                    align: 'left',
+                    style: {
+                        fontSize: '14px',
+                        fontWeight: 500
+                    }
+                }
+            };
+
+            const chart = new ApexCharts(document.querySelector("#budget-usage-chart"), options);
+            chart.render();
+        }
+        
+        // Popular a tabela de supervisores
+        function populateSupervisorsTable(data) {
+            const tableBody = document.querySelector('#supervisors-table tbody');
+            tableBody.innerHTML = '';
+            
+            data.forEach(supervisor => {
+                const row = document.createElement('tr');
+                
+                // Coluna de supervisor
+                const userCell = document.createElement('td');
+                userCell.innerHTML = `
+                    <div class="user-info">
+                        <div class="avatar avatar-primary">${supervisor.initials}</div>
+                        <div class="user-details">
+                            <div class="user-name">${supervisor.name}</div>
+                            <div class="user-role">${supervisor.role}</div>
+                        </div>
+                    </div>
+                `;
+                
+                // Coluna de contratos
+                const contractsCell = document.createElement('td');
+                contractsCell.textContent = supervisor.contracts;
+                
+                // Coluna de performance
+                const trendCell = document.createElement('td');
+                const trendClass = supervisor.trend >= 0 ? 'badge-success' : 'badge-danger';
+                const trendIcon = supervisor.trend >= 0 ? 'fa-arrow-up' : 'fa-arrow-down';
+                trendCell.innerHTML = `<span class="badge ${trendClass}">
+                    <i class="fas ${trendIcon}"></i> ${Math.abs(supervisor.trend)}%
+                </span>`;
+                
+                // Adicionar células à linha
+                row.appendChild(userCell);
+                row.appendChild(contractsCell);
+                row.appendChild(trendCell);
+                
+                // Adicionar linha à tabela
+                tableBody.appendChild(row);
+            });
+        }
+        
+        // Popular a tabela de budgets estourados
+        function populateBudgetTable(data) {
+            const tableBody = document.querySelector('#budget-table tbody');
+            tableBody.innerHTML = '';
+            
+            data.forEach(item => {
+                const row = document.createElement('tr');
+                
+                // Construir as células
+                const contractCell = document.createElement('td');
+                contractCell.textContent = item.contract;
+                
+                const companyCell = document.createElement('td');
+                companyCell.textContent = item.company;
+                
+                const budgetCell = document.createElement('td');
+                budgetCell.textContent = formatCurrency(item.budget);
+                
+                const currentCell = document.createElement('td');
+                currentCell.textContent = formatCurrency(item.current);
+                
+                const exceededCell = document.createElement('td');
+                const exceededPercent = ((item.current - item.budget) / item.budget * 100).toFixed(1);
+                exceededCell.textContent = `+${exceededPercent}%`;
+                exceededCell.style.color = exceededPercent > 10 ? colors.danger : colors.warning;
+                
+                const statusCell = document.createElement('td');
+                const statusClass = item.status === 'Crítico' ? 'badge-danger' : 'badge-warning';
+                statusCell.innerHTML = `<span class="badge ${statusClass}">${item.status}</span>`;
+                
+                // Adicionar células à linha
+                row.appendChild(contractCell);
+                row.appendChild(companyCell);
+                row.appendChild(budgetCell);
+                row.appendChild(currentCell);
+                row.appendChild(exceededCell);
+                row.appendChild(statusCell);
+                
+                // Adicionar linha à tabela
+                tableBody.appendChild(row);
+            });
+        }
+        
+        // Popular a tabela de produtos (mais/menos pedidos)
+        function populateProductsTable(data, tableId, isTopProducts) {
+            const tableBody = document.querySelector(`#${tableId} tbody`);
+            tableBody.innerHTML = '';
+            
+            data.forEach(product => {
+                const row = document.createElement('tr');
+                
+                // Coluna do produto
+                const productCell = document.createElement('td');
+                productCell.innerHTML = `
+                    <div class="table-product">
+                        <div class="product-image">
+                            <i class="fas fa-box"></i>
+                        </div>
+                        <div class="product-details">
+                            <div class="product-name">${product.name}</div>
+                            <div class="product-category">${product.category}</div>
+                        </div>
+                    </div>
+                `;
+                
+                // Coluna de quantidade de pedidos
+                const ordersCell = document.createElement('td');
+                ordersCell.textContent = product.orders;
+                
+                // Coluna de valor total
+                const valueCell = document.createElement('td');
+                valueCell.textContent = formatCurrency(product.value);
+                
+                // Coluna de tendência ou última data
+                const lastCell = document.createElement('td');
+                if (isTopProducts) {
+                    const trendClass = product.trend >= 0 ? 'badge-success' : 'badge-danger';
+                    const trendIcon = product.trend >= 0 ? 'fa-arrow-up' : 'fa-arrow-down';
+                    lastCell.innerHTML = `<span class="badge ${trendClass}">
+                        <i class="fas ${trendIcon}"></i> ${Math.abs(product.trend)}%
+                    </span>`;
+                } else {
+                    lastCell.textContent = product.lastOrder;
+                }
+                
+                // Adicionar células à linha
+                row.appendChild(productCell);
+                row.appendChild(ordersCell);
+                row.appendChild(valueCell);
+                row.appendChild(lastCell);
+                
+                // Adicionar linha à tabela
+                tableBody.appendChild(row);
+            });
+        }
+        
+        // Gerar HTML para tendências
+        function getTrendHTML(value, isInverse = false) {
+            const isPositive = isInverse ? value < 0 : value > 0;
+            const absValue = Math.abs(value);
+            const trendClass = isPositive ? 'trend-up' : 'trend-down';
+            const trendIcon = isPositive ? 'fa-arrow-up' : 'fa-arrow-down';
+            
+            return `<span class="${trendClass}">
+                <i class="fas ${trendIcon}"></i> ${absValue.toFixed(1)}%
+            </span> desde o último período`;
+        }
+        
+        // Vincular eventos
+        function bindEvents() {
+            // Atualizar dashboard ao clicar no botão
+            document.getElementById('update-dashboard').addEventListener('click', function() {
+                // Coletar valores dos filtros
+                dashboardState.filters.company = document.getElementById('company-filter').value;
+                dashboardState.filters.contract = document.getElementById('contract-filter').value;
+                dashboardState.filters.period = document.getElementById('period-filter').value;
+                
+                // Carregar dados com os novos filtros
+                loadDashboardData();
+            });
+            
+            // Exportar dados
+            document.getElementById('export-data').addEventListener('click', function() {
+                // Obter os valores dos filtros atuais
+                const empresa = document.getElementById('company-filter').value;
+                const contrato = document.getElementById('contract-filter').value;
+                const periodo = document.getElementById('period-filter').value;
+                
+                // Construir a URL com os parâmetros
+                const url = `/visao-gerencial/exportar/?empresa=${empresa}&contrato=${contrato}&periodo=${periodo}`;
+                
+                // Abrir a URL em uma nova aba/janela para download
+                window.open(url, '_blank');
+            });
+
+            // Adicionar evento para o botão de diagnóstico
+            document.getElementById('debug-data').addEventListener('click', function() {
+                // Abrir a URL de verificação em uma nova aba
+                window.open('/visao-gerencial/verificar-dados/', '_blank');
+            });
+        }
+        
+        // Inicializar dashboard
+        function initDashboard() {
+            bindEvents();
+            loadDashboardData();
+        }
+        
+        // Iniciar o dashboard
+        initDashboard();
+
+        // Função para preencher as opções dos filtros
+        function populateFilterOptions(options) {
+            // Preencher dropdown de empresas
+            const companyFilter = document.getElementById('company-filter');
+            
+            // Manter a opção "Todas as empresas" e limpar o resto
+            while (companyFilter.options.length > 1) {
+                companyFilter.remove(1);
+            }
+            
+            // Adicionar as opções de empresas
+            if (options.companies && options.companies.length) {
+                options.companies.forEach(company => {
+                    const option = document.createElement('option');
+                    option.value = company.id;
+                    option.textContent = company.name;
+                    
+                    // Selecionar automaticamente se for o valor atual
+                    if (company.id === dashboardState.filters.company) {
+                        option.selected = true;
+                    }
+                    
+                    companyFilter.appendChild(option);
+                });
+            }
+            
+            // Preencher dropdown de contratos
+            updateContractOptions(options.contracts);
+            
+            // Adicionar evento para atualizar contratos quando mudar a empresa
+            companyFilter.addEventListener('change', function() {
+                // Atualizar o estado com a nova empresa selecionada
+                dashboardState.filters.company = this.value;
+                
+                // Atualizar as opções de contratos com base na empresa selecionada
+                updateContractOptions(options.contracts);
+            });
+        }
+        
+        // Função para atualizar as opções de contratos com base na empresa selecionada
+        function updateContractOptions(contracts) {
+            const contractFilter = document.getElementById('contract-filter');
+            const selectedCompany = document.getElementById('company-filter').value;
+            
+            // Manter a opção "Todos os contratos" e limpar o resto
+            while (contractFilter.options.length > 1) {
+                contractFilter.remove(1);
+            }
+            
+            // Adicionar as opções de contratos filtradas pela empresa selecionada
+            if (contracts && contracts.length) {
+                const filteredContracts = selectedCompany === 'all' 
+                    ? contracts 
+                    : contracts.filter(contract => contract.company_id === selectedCompany);
+                
+                filteredContracts.forEach(contract => {
+                    const option = document.createElement('option');
+                    option.value = contract.id;
+                    option.textContent = contract.name;
+                    
+                    // Selecionar automaticamente se for o valor atual
+                    if (contract.id === dashboardState.filters.contract) {
+                        option.selected = true;
+                    }
+                    
+                    contractFilter.appendChild(option);
+                });
+            }
+        }
+    });
+</script>
+{% endblock %} 

@@ -1,0 +1,172 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static %}
+
+{% block title %}Confirmar Restauração | {{ site_title|default:_('Django site admin') }}{% endblock %}
+
+{% block extrastyle %}
+  {{ block.super }}
+  <style>
+    .confirm-container {
+      max-width: 800px;
+      margin: 20px auto;
+      padding: 20px;
+      background-color: #fff;
+      border-radius: 5px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+    }
+    
+    .confirm-container h1 {
+      margin-top: 0;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 10px;
+      color: #417690;
+    }
+    
+    .backup-details {
+      background-color: #f8f9fa;
+      border-left: 4px solid #79aec8;
+      padding: 15px;
+      margin-bottom: 20px;
+    }
+    
+    .backup-details table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+    
+    .backup-details table th,
+    .backup-details table td {
+      padding: 8px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+    }
+    
+    .backup-details table th {
+      font-weight: bold;
+      width: 40%;
+    }
+    
+    .final-warning {
+      background-color: #ffe5e5;
+      border-left: 4px solid #dc3545;
+      padding: 15px;
+      margin: 20px 0;
+      font-weight: bold;
+      color: #dc3545;
+    }
+    
+    .btn-container {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 20px;
+    }
+    
+    .cancel-btn {
+      background-color: #6c757d;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      cursor: pointer;
+      border-radius: 4px;
+      text-decoration: none;
+      font-weight: bold;
+      transition: background-color 0.3s;
+    }
+    
+    .cancel-btn:hover {
+      background-color: #5a6268;
+    }
+    
+    .confirm-btn {
+      background-color: #dc3545;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      cursor: pointer;
+      border-radius: 4px;
+      font-weight: bold;
+      transition: background-color 0.3s;
+    }
+    
+    .confirm-btn:hover {
+      background-color: #c82333;
+    }
+    
+    .confirm-btn:disabled {
+      background-color: #cccccc;
+      cursor: not-allowed;
+    }
+  </style>
+{% endblock %}
+
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+  <a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+  &rsaquo; <a href="{% url 'admin:restaurar_sistema' %}">{% trans 'Restaurar Sistema' %}</a>
+  &rsaquo; {% trans 'Confirmar Restauração' %}
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="confirm-container">
+  <h1>Confirmar Restauração</h1>
+  
+  <div class="backup-details">
+    <p><strong>Informações do Backup:</strong></p>
+    <table>
+      <tr>
+        <th>Data do Backup:</th>
+        <td>{{ backup_info.data_backup|default:"Desconhecida" }}</td>
+      </tr>
+      <tr>
+        <th>Versão do Sistema:</th>
+        <td>{{ backup_info.versao_sistema|default:"Desconhecida" }}</td>
+      </tr>
+      <tr>
+        <th>Criado por:</th>
+        <td>{{ backup_info.usuario|default:"Desconhecido" }}</td>
+      </tr>
+      {% if backup_info.django_version %}
+      <tr>
+        <th>Versão do Django:</th>
+        <td>{{ backup_info.django_version }}</td>
+      </tr>
+      {% endif %}
+      {% if backup_info.metodo_backup %}
+      <tr>
+        <th>Método de Backup:</th>
+        <td>{{ backup_info.metodo_backup }}</td>
+      </tr>
+      {% endif %}
+    </table>
+  </div>
+  
+  <div class="final-warning">
+    <p>ATENÇÃO: Esta é sua última chance de cancelar!</p>
+    <p>Ao prosseguir, todos os dados atuais serão substituídos pelos dados do backup selecionado.</p>
+    <p>Esta ação é irreversível, embora o sistema crie automaticamente uma cópia de segurança dos dados atuais.</p>
+  </div>
+  
+  <form method="post" action="{% url 'admin:confirmar_restauracao' %}" id="confirm-form">
+    {% csrf_token %}
+    
+    <div class="btn-container">
+      <a href="{% url 'admin:restaurar_sistema' %}" class="cancel-btn">Cancelar</a>
+      <button type="submit" class="confirm-btn" id="confirm-btn">Confirmar Restauração</button>
+    </div>
+  </form>
+</div>
+
+<script>
+  document.getElementById('confirm-form').addEventListener('submit', function(e) {
+    if (!confirm('CONFIRMAÇÃO FINAL: Você realmente deseja prosseguir com a restauração do sistema?')) {
+      e.preventDefault();
+      return false;
+    }
+    
+    document.getElementById('confirm-btn').disabled = true;
+    document.getElementById('confirm-btn').textContent = 'Restaurando...';
+  });
+</script>
+{% endblock %} 

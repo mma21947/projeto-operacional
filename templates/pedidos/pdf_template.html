@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>{{ titulo }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 2cm;
+            font-size: 12px;
+        }
+        h1, h2 {
+            text-align: center;
+            color: #1a468f;
+            margin-bottom: 20px;
+        }
+        h2 {
+            font-size: 16px;
+            margin-top: 30px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th {
+            background-color: #f2f2f2;
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+            font-weight: bold;
+        }
+        td {
+            padding: 8px;
+            border-bottom: 1px solid #ddd;
+        }
+        .footer {
+            margin-top: 30px;
+            text-align: center;
+            font-size: 10px;
+            color: #666;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #1a468f;
+        }
+        .status-pendente { color: #ffc107; }
+        .status-aprovado { color: #17a2b8; }
+        .status-enviado { color: #007bff; }
+        .status-entregue { color: #28a745; }
+        .status-cancelado { color: #dc3545; }
+        .total { font-weight: bold; text-align: right; }
+        .pedido-info {
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+        }
+        .pedido-itens {
+            margin-left: 20px;
+            margin-bottom: 30px;
+        }
+        .item-header {
+            background-color: #e9ecef;
+            font-weight: bold;
+        }
+        .page-break {
+            page-break-before: always;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo">Sistema de Pedidos</div>
+        <div>{{ titulo }} - {{ pedidos.count }} pedido(s)</div>
+        <div>Data de geração: {% now "d/m/Y H:i" %}</div>
+    </div>
+    
+    <h1>Relatório de Pedidos</h1>
+    
+    <!-- Tabela resumida de pedidos -->
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Contrato</th>
+                <th>Empresa</th>
+                <th>Lote</th>
+                <th>Data</th>
+                <th>Status</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for pedido in pedidos %}
+            <tr>
+                <td>#{{ pedido.id }}</td>
+                <td>{{ pedido.escola.nome }}</td>
+                <td>{{ pedido.escola.empresa|default:"-" }}</td>
+                <td>{{ pedido.escola.lote|default:"-" }}</td>
+                <td>{{ pedido.data_solicitacao|date:"d/m/Y H:i" }}</td>
+                <td class="status-{{ pedido.status }}">{{ pedido.get_status_display }}</td>
+                <td class="total">R$ {{ pedido.valor_total|floatformat:2 }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Nova página para detalhes dos pedidos -->
+    <div class="page-break"></div>
+    <h2>Detalhes dos Pedidos e Itens</h2>
+    
+    {% for pedido in pedidos %}
+    <div class="pedido-info">
+        <h3>Pedido #{{ pedido.id }}</h3>
+        <p><strong>Contrato:</strong> {{ pedido.escola.nome }}</p>
+        <p><strong>Empresa:</strong> {{ pedido.escola.empresa|default:"-" }}</p>
+        <p><strong>Lote:</strong> {{ pedido.escola.lote|default:"-" }}</p>
+        <p><strong>Data:</strong> {{ pedido.data_solicitacao|date:"d/m/Y H:i" }}</p>
+        <p><strong>Status:</strong> {{ pedido.get_status_display }}</p>
+        <p><strong>Valor Total:</strong> R$ {{ pedido.valor_total|floatformat:2 }}</p>
+        
+        <div class="pedido-itens">
+            <h4>Itens do Pedido ({{ pedido.itens.count }} itens)</h4>
+            <table>
+                <thead>
+                    <tr class="item-header">
+                        <th>Produto</th>
+                        <th>Quantidade</th>
+                        <th>Valor Unitário</th>
+                        <th>Valor Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in pedido.itens.all %}
+                    <tr>
+                        <td>{{ item.produto.nome }}</td>
+                        <td>{{ item.quantidade }}</td>
+                        <td>R$ {{ item.valor_unitario|floatformat:2 }}</td>
+                        <td>R$ {{ item.valor_total|floatformat:2 }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endfor %}
+    
+    <div class="footer">
+        Este é um documento gerado automaticamente pelo Sistema de Pedidos.
+    </div>
+</body>
+</html> 
